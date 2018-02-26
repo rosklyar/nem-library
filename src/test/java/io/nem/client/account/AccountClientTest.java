@@ -1,7 +1,9 @@
 package io.nem.client.account;
 
 import io.nem.client.DefaultNemClientFactory;
+import io.nem.client.account.request.AccountPrivateKeyTransactionsPage;
 import io.nem.client.account.response.*;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -10,6 +12,8 @@ import java.util.List;
 import static io.nem.client.account.response.AccountMetaData.RemoteStatus.INACTIVE;
 import static io.nem.client.account.response.AccountMetaData.Status.LOCKED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 class AccountClientTest {
 
@@ -19,6 +23,7 @@ class AccountClientTest {
     private final String cosignatoryAddress = "TBNDMABIECCN6EQY5WVNJZMCXAUVTN7RKGZH4CP4";
     private final String publicKey = "5f5f2bce1a0911aeec9a594a9f8fc4a80cfa193f4525120f53360389074b9a51";
     private final String cosignatoryPublicKey = "0d81da60546ccb7b54b59ac8c1e8d2d0008c20bf76770a75b7bd5a853c26797b";
+    private final String privateKey = "0476fd96242ac5ef6cb1b268887254c1a3089759556beb1ce660c0cb2c42bb27";
 
     @Test
     void getAccount() {
@@ -151,5 +156,39 @@ class AccountClientTest {
     void getUnconfirmedTransactions() {
         UnconfirmedTransactions unconfirmedTransactions = accountClient.unconfirmedTransactions(address);
         assertEquals(0, unconfirmedTransactions.data.size());
+    }
+
+    @Test
+    @Disabled
+    void getDecodedIncomingTransactions() {
+        Transactions transactions = accountClient.incomingDecodedTransactions(new AccountPrivateKeyTransactionsPage(privateKey, null, null));
+        assertEquals("", transactions.data.stream().findFirst().map(pair -> pair.transaction.message.payload).orElse(null));
+    }
+
+    @Test
+    @Disabled
+    void getDecodedOutgoingTransactions() {
+        Transactions transactions = accountClient.outgoingDecodedTransactions(new AccountPrivateKeyTransactionsPage(privateKey, null, null));
+        assertEquals("", transactions.data.stream().findFirst().map(pair -> pair.transaction.message.payload).orElse(null));
+    }
+
+    @Test
+    @Disabled
+    void getDecodedAllTransactions() {
+        Transactions transactions = accountClient.allDecodedTransactions(new AccountPrivateKeyTransactionsPage(privateKey, null, null));
+        assertEquals("", transactions.data.stream().findFirst().map(pair -> pair.transaction.message.payload).orElse(null));
+    }
+
+    @Test
+    void getHarvests() {
+        List<HarvestInfo> harvests = accountClient.harvests(address, null).data;
+        assertEquals(0, harvests.size());
+    }
+
+    @Test
+    void getImportances() {
+        ImportanceResponse importanceResponse = accountClient.importances();
+        assumeTrue(importanceResponse.data.size() > 0);
+        assertTrue(importanceResponse.data.stream().filter(info -> info.importance.isSet).findFirst().get().importance.score > 0);
     }
 }

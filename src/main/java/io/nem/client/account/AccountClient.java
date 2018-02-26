@@ -1,8 +1,10 @@
 package io.nem.client.account;
 
+import io.nem.client.account.request.AccountPrivateKeyTransactionsPage;
 import io.nem.client.account.response.*;
 
 public interface AccountClient {
+
     KeyPair generate();
 
     AccountMetaDataPair getFromAddress(String address);
@@ -28,4 +30,14 @@ public interface AccountClient {
     Transactions allTransactions(String address, long id);
 
     UnconfirmedTransactions unconfirmedTransactions(String address);
+
+    Transactions incomingDecodedTransactions(AccountPrivateKeyTransactionsPage request);
+
+    Transactions outgoingDecodedTransactions(AccountPrivateKeyTransactionsPage request);
+
+    Transactions allDecodedTransactions(AccountPrivateKeyTransactionsPage request);
+
+    HarvestsResponse harvests(String address, String hash);
+
+    ImportanceResponse importances();
 }

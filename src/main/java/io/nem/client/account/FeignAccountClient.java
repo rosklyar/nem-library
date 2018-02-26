@@ -3,6 +3,7 @@ package io.nem.client.account;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
+import io.nem.client.account.request.AccountPrivateKeyTransactionsPage;
 import io.nem.client.account.response.*;
 
 @Headers({"Accept: application/json"})
@@ -58,4 +59,27 @@ public interface FeignAccountClient extends AccountClient {
     @Override
     @RequestLine("GET /account/unconfirmedTransactions?address={address}")
     UnconfirmedTransactions unconfirmedTransactions(@Param("address") String address);
+
+    @Override
+    @Headers("Content-Type: application/json")
+    @RequestLine("POST /local/account/transfers/incoming")
+    Transactions incomingDecodedTransactions(AccountPrivateKeyTransactionsPage request);
+
+    @Override
+    @Headers("Content-Type: application/json")
+    @RequestLine("POST /local/account/transfers/outgoing")
+    Transactions outgoingDecodedTransactions(AccountPrivateKeyTransactionsPage request);
+
+    @Override
+    @Headers("Content-Type: application/json")
+    @RequestLine("POST /local/account/transfers/all")
+    Transactions allDecodedTransactions(AccountPrivateKeyTransactionsPage request);
+
+    @Override
+    @RequestLine("GET /account/harvests?address={address}&hash={hash}")
+    HarvestsResponse harvests(@Param("address") String address, @Param("hash") String hash);
+
+    @Override
+    @RequestLine("GET /account/importances")
+    ImportanceResponse importances();
 }
