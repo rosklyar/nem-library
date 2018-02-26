@@ -8,6 +8,7 @@ import io.nem.client.account.response.*;
 
 @Headers({"Accept: application/json"})
 public interface FeignAccountClient extends AccountClient {
+
     @Override
     @RequestLine("GET /account/generate")
     KeyPair generate();
@@ -82,4 +83,8 @@ public interface FeignAccountClient extends AccountClient {
     @Override
     @RequestLine("GET /account/importances")
     ImportanceResponse importances();
+
+    @Override
+    @RequestLine("GET /account/namespace/page?address={address}&parent={parent}&id={id}&pageSize={pageSize}")
+    NamespacesResponse namespaces(@Param("address") String address, @Param("parent") String parent, @Param("id") Long id, @Param("pageSize") Integer pageSize);
 }

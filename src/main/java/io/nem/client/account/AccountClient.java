@@ -40,4 +40,7 @@ public interface AccountClient {
     HarvestsResponse harvests(String address, String hash);
 
     ImportanceResponse importances();
+
+    NamespacesResponse namespaces(String address, String parent, Long id, Integer pageSize);
+
 }
