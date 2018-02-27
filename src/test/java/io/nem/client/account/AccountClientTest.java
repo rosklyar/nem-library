@@ -37,7 +37,7 @@ class AccountClientTest {
     private final String privateKey = "0476fd96242ac5ef6cb1b268887254c1a3089759556beb1ce660c0cb2c42bb27";
 
     @Test
-    @Disabled
+    @Disabled("only for local NIS nodes")
     void generate() {
         KeyPair keyPair = accountClient.generate();
         assertNotNull(keyPair.publicKey);
@@ -177,21 +177,21 @@ class AccountClientTest {
     }
 
     @Test
-    @Disabled
+    @Disabled("only for local NIS nodes")
     void getDecodedIncomingTransactions() {
         Transactions transactions = accountClient.incomingDecodedTransactions(new AccountPrivateKeyTransactionsPage(privateKey, null, null));
         assertEquals("", transactions.data.stream().findFirst().map(pair -> pair.transaction.message.payload).orElse(null));
     }
 
     @Test
-    @Disabled
+    @Disabled("only for local NIS nodes")
     void getDecodedOutgoingTransactions() {
         Transactions transactions = accountClient.outgoingDecodedTransactions(new AccountPrivateKeyTransactionsPage(privateKey, null, null));
         assertEquals("", transactions.data.stream().findFirst().map(pair -> pair.transaction.message.payload).orElse(null));
     }
 
     @Test
-    @Disabled
+    @Disabled("only for local NIS nodes")
     void getDecodedAllTransactions() {
         Transactions transactions = accountClient.allDecodedTransactions(new AccountPrivateKeyTransactionsPage(privateKey, null, null));
         assertEquals("", transactions.data.stream().findFirst().map(pair -> pair.transaction.message.payload).orElse(null));
@@ -231,26 +231,25 @@ class AccountClientTest {
     }
 
     @Test
-    @Disabled
+    @Disabled("only for local NIS")
     void tryToUnlock() {
         assertThrows(FeignException.class, () -> accountClient.unlock(new PrivateKey(privateKey)));
     }
 
     @Test
-    @Disabled
+    @Disabled("only for local NIS")
     void tryToLock() {
         accountClient.lock(new PrivateKey(privateKey));
     }
 
     @Test
-    @Disabled
     void getUnlockedInfo() {
         UnlockedInfo unlockedInfo = accountClient.unlockedInfo();
-        assertEquals(new UnlockedInfo(0, 4), unlockedInfo);
+        assertNotNull(unlockedInfo);
     }
 
     @Test
-    @Disabled
+    @Disabled("only for NIS nodes that supports historical data feature")
     void getHistory() {
         HistoryResponse history = accountClient.history(address, 1002229, 1003229, 100);
         assertEquals(address, history.data.stream().findFirst().orElseThrow(RuntimeException::new).address);
