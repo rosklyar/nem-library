@@ -1,7 +1,10 @@
-package io.nem.client.account.response;
+package io.nem.client.account.response.transaction;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import io.nem.client.account.response.Message;
+import io.nem.client.account.response.Modification;
+import io.nem.client.account.response.Signature;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

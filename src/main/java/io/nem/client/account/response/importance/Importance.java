@@ -1,4 +1,4 @@
-package io.nem.client.account.response;
+package io.nem.client.account.response.importance;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
@@ -9,17 +9,16 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 @Builder
-@JsonDeserialize(builder = HarvestInfo.HarvestInfoBuilder.class)
-public class HarvestInfo {
+@JsonDeserialize(builder = Importance.ImportanceBuilder.class)
+public class Importance {
 
-    public final long timeStamp;
-    public final long difficulty;
-    public final long totalFee;
-    public final long id;
+    public final double score;
+    public final double ev;
+    public final boolean isSet;
     public final long height;
 
     @JsonPOJOBuilder(withPrefix = "")
-    public static class HarvestInfoBuilder {
+    public static class ImportanceBuilder {
 
     }
 }

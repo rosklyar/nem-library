@@ -1,4 +1,4 @@
-package io.nem.client.account.response;
+package io.nem.client.account.response.mosaic;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -9,12 +9,12 @@ import java.util.List;
 
 @EqualsAndHashCode
 @ToString
-public class NamespacesResponse {
+public class MosaicsResponse {
 
-    public final List<Namespace> data;
+    public final List<MosaicInfo> data;
 
     @JsonCreator
-    public NamespacesResponse(@JsonProperty("data") List<Namespace> data) {
+    public MosaicsResponse(@JsonProperty("data") List<MosaicInfo> data) {
         this.data = data;
     }
 }

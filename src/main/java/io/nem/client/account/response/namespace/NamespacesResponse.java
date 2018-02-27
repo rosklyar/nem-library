@@ -1,4 +1,4 @@
-package io.nem.client.account.response;
+package io.nem.client.account.response.namespace;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -9,12 +9,12 @@ import java.util.List;
 
 @EqualsAndHashCode
 @ToString
-public class HarvestsResponse {
+public class NamespacesResponse {
 
-    public final List<HarvestInfo> data;
+    public final List<Namespace> data;
 
     @JsonCreator
-    public HarvestsResponse(@JsonProperty("data") List<HarvestInfo> data) {
+    public NamespacesResponse(@JsonProperty("data") List<Namespace> data) {
         this.data = data;
     }
 }

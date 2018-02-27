@@ -1,8 +1,20 @@
 package io.nem.client.account;
 
+import feign.FeignException;
 import io.nem.client.DefaultNemClientFactory;
 import io.nem.client.account.request.AccountPrivateKeyTransactionsPage;
+import io.nem.client.account.request.PrivateKey;
 import io.nem.client.account.response.*;
+import io.nem.client.account.response.harvest.HarvestInfo;
+import io.nem.client.account.response.history.HistoryResponse;
+import io.nem.client.account.response.importance.ImportanceResponse;
+import io.nem.client.account.response.mosaic.MosaicId;
+import io.nem.client.account.response.mosaic.MosaicsResponse;
+import io.nem.client.account.response.mosaic.OwnedMosaic;
+import io.nem.client.account.response.mosaic.OwnedMosaicsResponse;
+import io.nem.client.account.response.namespace.NamespacesResponse;
+import io.nem.client.account.response.transaction.Transactions;
+import io.nem.client.account.response.transaction.UnconfirmedTransactions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -11,9 +23,7 @@ import java.util.List;
 
 import static io.nem.client.account.response.AccountMetaData.RemoteStatus.INACTIVE;
 import static io.nem.client.account.response.AccountMetaData.Status.LOCKED;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 class AccountClientTest {
@@ -28,7 +38,7 @@ class AccountClientTest {
 
     @Test
     @Disabled
-    void generate(){
+    void generate() {
         KeyPair keyPair = accountClient.generate();
         assertNotNull(keyPair.publicKey);
     }
@@ -206,5 +216,43 @@ class AccountClientTest {
         assertEquals(0, namespaces.data.size());
     }
 
+    @Test
+    void getMosaics() {
+        MosaicsResponse mosaics = accountClient.mosaics(address, null, null);
+        assertEquals(0, mosaics.data.size());
+    }
 
+    @Test
+    void getOwnedMosaics() {
+        List<OwnedMosaic> expectedOwnedMosaics = new ArrayList<>();
+        expectedOwnedMosaics.add(new OwnedMosaic(new MosaicId("nem", "xem"), 1.3E7));
+        OwnedMosaicsResponse ownedMosaicsResponse = accountClient.ownedMosaics(address);
+        assertEquals(expectedOwnedMosaics, ownedMosaicsResponse.data);
+    }
+
+    @Test
+    @Disabled
+    void tryToUnlock() {
+        assertThrows(FeignException.class, () -> accountClient.unlock(new PrivateKey(privateKey)));
+    }
+
+    @Test
+    @Disabled
+    void tryToLock() {
+        accountClient.lock(new PrivateKey(privateKey));
+    }
+
+    @Test
+    @Disabled
+    void getUnlockedInfo() {
+        UnlockedInfo unlockedInfo = accountClient.unlockedInfo();
+        assertEquals(new UnlockedInfo(0, 4), unlockedInfo);
+    }
+
+    @Test
+    @Disabled
+    void getHistory() {
+        HistoryResponse history = accountClient.history(address, 1002229, 1003229, 100);
+        assertEquals(address, history.data.stream().findFirst().orElseThrow(RuntimeException::new).address);
+    }
 }

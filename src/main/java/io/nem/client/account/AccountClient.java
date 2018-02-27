@@ -1,7 +1,19 @@
 package io.nem.client.account;
 
 import io.nem.client.account.request.AccountPrivateKeyTransactionsPage;
-import io.nem.client.account.response.*;
+import io.nem.client.account.request.PrivateKey;
+import io.nem.client.account.response.AccountMetaData;
+import io.nem.client.account.response.AccountMetaDataPair;
+import io.nem.client.account.response.KeyPair;
+import io.nem.client.account.response.UnlockedInfo;
+import io.nem.client.account.response.harvest.HarvestsResponse;
+import io.nem.client.account.response.history.HistoryResponse;
+import io.nem.client.account.response.importance.ImportanceResponse;
+import io.nem.client.account.response.mosaic.MosaicsResponse;
+import io.nem.client.account.response.mosaic.OwnedMosaicsResponse;
+import io.nem.client.account.response.namespace.NamespacesResponse;
+import io.nem.client.account.response.transaction.Transactions;
+import io.nem.client.account.response.transaction.UnconfirmedTransactions;
 
 public interface AccountClient {
 
@@ -43,4 +55,15 @@ public interface AccountClient {
 
     NamespacesResponse namespaces(String address, String parent, Long id, Integer pageSize);
 
+    MosaicsResponse mosaics(String address, String parent, Long id);
+
+    OwnedMosaicsResponse ownedMosaics(String address);
+
+    void unlock(PrivateKey privateKey);
+
+    void lock(PrivateKey privateKey);
+
+    UnlockedInfo unlockedInfo();
+
+    HistoryResponse history(String address, long startHeight, long endHeight, int increment);
 }

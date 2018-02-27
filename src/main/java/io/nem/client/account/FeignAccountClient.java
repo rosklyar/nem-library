@@ -4,7 +4,19 @@ import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
 import io.nem.client.account.request.AccountPrivateKeyTransactionsPage;
-import io.nem.client.account.response.*;
+import io.nem.client.account.request.PrivateKey;
+import io.nem.client.account.response.AccountMetaData;
+import io.nem.client.account.response.AccountMetaDataPair;
+import io.nem.client.account.response.KeyPair;
+import io.nem.client.account.response.UnlockedInfo;
+import io.nem.client.account.response.harvest.HarvestsResponse;
+import io.nem.client.account.response.history.HistoryResponse;
+import io.nem.client.account.response.importance.ImportanceResponse;
+import io.nem.client.account.response.mosaic.MosaicsResponse;
+import io.nem.client.account.response.mosaic.OwnedMosaicsResponse;
+import io.nem.client.account.response.namespace.NamespacesResponse;
+import io.nem.client.account.response.transaction.Transactions;
+import io.nem.client.account.response.transaction.UnconfirmedTransactions;
 
 @Headers({"Accept: application/json"})
 public interface FeignAccountClient extends AccountClient {
@@ -87,4 +99,31 @@ public interface FeignAccountClient extends AccountClient {
     @Override
     @RequestLine("GET /account/namespace/page?address={address}&parent={parent}&id={id}&pageSize={pageSize}")
     NamespacesResponse namespaces(@Param("address") String address, @Param("parent") String parent, @Param("id") Long id, @Param("pageSize") Integer pageSize);
+
+    @Override
+    @RequestLine("GET /account/mosaic/definition/page?address={address}&parent={parent}&id={id}")
+    MosaicsResponse mosaics(@Param("address") String address, @Param("parent") String parent, @Param("id") Long id);
+
+    @Override
+    @RequestLine("GET /account/mosaic/owned?address={address}")
+    OwnedMosaicsResponse ownedMosaics(@Param("address") String address);
+
+    @Override
+    @Headers("Content-Type: application/json")
+    @RequestLine("POST /account/unlock")
+    void unlock(PrivateKey privateKey);
+
+    @Override
+    @Headers("Content-Type: application/json")
+    @RequestLine("POST /account/lock")
+    void lock(PrivateKey privateKey);
+
+    @Override
+    @RequestLine("POST /account/unlocked/info")
+    UnlockedInfo unlockedInfo();
+
+    @Override
+    @RequestLine("GET /account/historical/get?address={address}&startHeight={startHeight}&endHeight={endHeight}&increment={increment}")
+    HistoryResponse history(@Param("address") String address, @Param("startHeight") long startHeight, @Param("endHeight") long endHeight, @Param("increment") int increment);
+
 }

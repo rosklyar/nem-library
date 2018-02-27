@@ -1,20 +1,18 @@
-package io.nem.client.account.response;
+package io.nem.client.account.response.transaction;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.util.List;
-
 @EqualsAndHashCode
 @ToString
-public class ImportanceResponse {
+public class UnconfirmedTransactionMetaData {
 
-    public final List<ImportanceInfo> data;
+    public final String data;
 
     @JsonCreator
-    public ImportanceResponse(@JsonProperty("data") List<ImportanceInfo> data) {
+    public UnconfirmedTransactionMetaData(@JsonProperty("data") String data) {
         this.data = data;
     }
 }

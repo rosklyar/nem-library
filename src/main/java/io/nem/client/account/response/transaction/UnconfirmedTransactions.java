@@ -1,4 +1,4 @@
-package io.nem.client.account.response;
+package io.nem.client.account.response.transaction;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

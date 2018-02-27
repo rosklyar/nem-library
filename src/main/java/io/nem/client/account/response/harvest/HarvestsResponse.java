@@ -1,18 +1,20 @@
-package io.nem.client.account.response;
+package io.nem.client.account.response.harvest;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.util.List;
+
 @EqualsAndHashCode
 @ToString
-public class UnconfirmedTransactionMetaData {
+public class HarvestsResponse {
 
-    public final String data;
+    public final List<HarvestInfo> data;
 
     @JsonCreator
-    public UnconfirmedTransactionMetaData(@JsonProperty("data") String data) {
+    public HarvestsResponse(@JsonProperty("data") List<HarvestInfo> data) {
         this.data = data;
     }
 }
