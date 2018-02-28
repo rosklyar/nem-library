@@ -1,4 +1,4 @@
-package io.nem.client.account.response.mosaic;
+package io.nem.client.mosaic.response;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
-import java.util.Map;
+import java.util.List;
 
 @EqualsAndHashCode
 @ToString
@@ -17,7 +17,8 @@ public class MosaicInfo {
     public final String creator;
     public final String description;
     public final MosaicId id;
-    public final Map<String, String> properties;
+    public final List<MosaicProperty> properties;
+    public final Levy levy;
 
     @JsonPOJOBuilder(withPrefix = "")
     public static class MosaicInfoBuilder {

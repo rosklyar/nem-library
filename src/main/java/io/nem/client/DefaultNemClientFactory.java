@@ -7,6 +7,8 @@ import io.nem.client.account.AccountClient;
 import io.nem.client.account.FeignAccountClient;
 import io.nem.client.blockchain.BlockchainClient;
 import io.nem.client.blockchain.FeignBlockchainClient;
+import io.nem.client.mosaic.FeignMosaicClient;
+import io.nem.client.mosaic.MosaicClient;
 import io.nem.client.node.FeignNodeClient;
 import io.nem.client.node.NodeClient;
 import io.nem.client.status.FeignStatusClient;
@@ -44,5 +46,13 @@ public class DefaultNemClientFactory implements NemClientFactory {
                 .encoder(new JacksonEncoder())
                 .decoder(new JacksonDecoder())
                 .target(FeignNodeClient.class, nodeUrl);
+    }
+
+    @Override
+    public MosaicClient createMosaicClient(String nodeUrl) {
+        return Feign.builder()
+                .encoder(new JacksonEncoder())
+                .decoder(new JacksonDecoder())
+                .target(FeignMosaicClient.class, nodeUrl);
     }
 }

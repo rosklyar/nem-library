@@ -1,8 +1,7 @@
-package io.nem.client.account.response.mosaic;
+package io.nem.client.mosaic.response;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.nem.client.mosaic.response.MosaicInfo;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
@@ -10,12 +9,13 @@ import java.util.List;
 
 @EqualsAndHashCode
 @ToString
-public class MosaicsResponse {
+public class MosaicsMetaDataResponse {
 
-    public final List<MosaicInfo> data;
+    public final List<MosaicMetaData> data;
 
     @JsonCreator
-    public MosaicsResponse(@JsonProperty("data") List<MosaicInfo> data) {
+    public MosaicsMetaDataResponse(@JsonProperty("data") List<MosaicMetaData> data) {
         this.data = data;
     }
+
 }

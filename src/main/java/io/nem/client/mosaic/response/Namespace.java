@@ -1,4 +1,4 @@
-package io.nem.client.account.response.namespace;
+package io.nem.client.mosaic.response;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
