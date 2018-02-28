@@ -2,7 +2,7 @@ package io.nem.client.blockchain;
 
 import feign.Headers;
 import feign.RequestLine;
-import io.nem.client.blockchain.request.block.BlockHeight;
+import io.nem.client.blockchain.response.block.BlockHeight;
 import io.nem.client.blockchain.response.HeightResponse;
 import io.nem.client.blockchain.response.ScoreResponse;
 import io.nem.client.blockchain.response.block.Block;
