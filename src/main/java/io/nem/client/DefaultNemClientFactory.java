@@ -13,6 +13,15 @@ import io.nem.client.node.FeignNodeClient;
 import io.nem.client.node.NodeClient;
 import io.nem.client.status.FeignStatusClient;
 import io.nem.client.status.StatusClient;
+import io.nem.client.transaction.FeignTransactionClient;
+import io.nem.client.transaction.SecureTransactionClient;
+import io.nem.client.transaction.TransactionClient;
+import io.nem.client.transaction.encode.*;
+import io.nem.client.transaction.fee.DefaultFeeProvider;
+import io.nem.client.transaction.fee.FeeProvider;
+import io.nem.client.transaction.version.DefaultVersionProvider;
+import io.nem.client.transaction.version.Network;
+import io.nem.client.transaction.version.VersionProvider;
 
 public class DefaultNemClientFactory implements NemClientFactory {
 
@@ -54,5 +63,21 @@ public class DefaultNemClientFactory implements NemClientFactory {
                 .encoder(new JacksonEncoder())
                 .decoder(new JacksonDecoder())
                 .target(FeignMosaicClient.class, nodeUrl);
+    }
+
+    @Override
+    public TransactionClient createTransactionClient(String nodeUrl, Network network) {
+        FeignTransactionClient feignTransactionClient = Feign.builder()
+                .encoder(new JacksonEncoder())
+                .decoder(new JacksonDecoder())
+                .target(FeignTransactionClient.class, nodeUrl);
+        ByteSerializer byteSerializer = new DefaultByteSerializer();
+        HexConverter hexConverter = new DefaultHexConverter();
+        TransactionEncoder transactionEncoder = new ByteArrayTransactionEncoder(byteSerializer, hexConverter);
+        VersionProvider versionProvider = new DefaultVersionProvider();
+        FeeProvider feeProvider = new DefaultFeeProvider();
+        NodeClient nodeClient = createNodeClient(nodeUrl);
+
+        return new SecureTransactionClient(network, feignTransactionClient, transactionEncoder, hexConverter, versionProvider, feeProvider, nodeClient);
     }
 }

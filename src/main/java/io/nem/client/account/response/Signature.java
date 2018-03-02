@@ -2,6 +2,7 @@ package io.nem.client.account.response;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import io.nem.client.common.Hash;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

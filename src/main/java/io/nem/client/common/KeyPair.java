@@ -1,4 +1,4 @@
-package io.nem.client.account.response;
+package io.nem.client.common;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;

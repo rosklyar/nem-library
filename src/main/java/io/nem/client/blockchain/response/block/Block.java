@@ -2,8 +2,8 @@ package io.nem.client.blockchain.response.block;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import io.nem.client.account.response.Hash;
-import io.nem.client.account.response.transaction.Transaction;
+import io.nem.client.common.Hash;
+import io.nem.client.transaction.Transaction;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

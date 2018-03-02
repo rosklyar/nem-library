@@ -8,6 +8,7 @@ import io.nem.client.account.response.*;
 import io.nem.client.account.response.harvest.HarvestInfo;
 import io.nem.client.account.response.history.HistoryResponse;
 import io.nem.client.account.response.importance.ImportanceResponse;
+import io.nem.client.common.KeyPair;
 import io.nem.client.mosaic.response.MosaicId;
 import io.nem.client.account.response.mosaic.MosaicsResponse;
 import io.nem.client.account.response.mosaic.OwnedMosaic;

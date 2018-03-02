@@ -4,7 +4,7 @@ import io.nem.client.account.request.AccountPrivateKeyTransactionsPage;
 import io.nem.client.account.request.PrivateKey;
 import io.nem.client.account.response.AccountMetaData;
 import io.nem.client.account.response.AccountMetaDataPair;
-import io.nem.client.account.response.KeyPair;
+import io.nem.client.common.KeyPair;
 import io.nem.client.account.response.UnlockedInfo;
 import io.nem.client.account.response.harvest.HarvestsResponse;
 import io.nem.client.account.response.history.HistoryResponse;

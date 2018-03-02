@@ -12,7 +12,7 @@ import lombok.ToString;
 @JsonDeserialize(builder = NisInfo.NisInfoBuilder.class)
 public class NisInfo {
 
-    public final long currentTime;
+    public final int currentTime;
     public final long startTime;
     public final String application;
     public final String version;

@@ -2,6 +2,7 @@ package io.nem.client.account.response.transaction;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.nem.client.transaction.Transaction;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 

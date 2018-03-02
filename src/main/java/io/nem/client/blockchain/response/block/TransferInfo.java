@@ -2,7 +2,7 @@ package io.nem.client.blockchain.response.block;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.nem.client.account.response.transaction.Transaction;
+import io.nem.client.transaction.Transaction;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
