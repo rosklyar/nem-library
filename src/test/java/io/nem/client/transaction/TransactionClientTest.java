@@ -2,16 +2,18 @@ package io.nem.client.transaction;
 
 import io.nem.client.DefaultNemClientFactory;
 import io.nem.client.transaction.response.NemAnnounceResult;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static io.nem.client.transaction.version.Network.TEST;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TransactionClientTest {
 
-    private final TransactionClient transactionClient = new DefaultNemClientFactory().createTransactionClient("http://5.128.82.36:7890", TEST);
+    private final TransactionClient transactionClient = new DefaultNemClientFactory().createTransactionClient("http://153.122.112.137:7890", TEST);
 
     @Test
+    @Disabled
     void makeNemTransfer() {
         NemAnnounceResult nemAnnounceResult = transactionClient.transferNem(
                 "fcf0dadc958510dca65651df81aa22c82b2bfe5b29bf8dfb92816bc5f1f11a54",
@@ -20,6 +22,6 @@ class TransactionClientTest {
                 "test1",
                 3600
         );
-        assertNotNull(nemAnnounceResult);
+        assertEquals(1, nemAnnounceResult.code);
     }
 }

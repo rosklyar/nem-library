@@ -4,6 +4,6 @@ public class DefaultVersionProvider implements VersionProvider {
 
     @Override
     public int version(Network network, int transactionType) {
-        return -1744830463;
+        return network == Network.TEST ? -1744830463 : 0x68000001;
     }
 }
