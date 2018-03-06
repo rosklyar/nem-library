@@ -1,8 +1,7 @@
-package io.nem.client.transaction;
+package io.nem.client.common;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
-import io.nem.client.common.Message;
 import io.nem.client.account.response.Modification;
 import io.nem.client.account.response.Signature;
 import lombok.Builder;
@@ -30,6 +29,7 @@ public class Transaction {
     public final List<Modification> modifications;
     public final Transaction otherTrans;
     public final List<Signature> signatures;
+    public final List<MosaicTransfer> mosaics;
 
     @JsonPOJOBuilder(withPrefix = "")
     public static class TransactionBuilder {

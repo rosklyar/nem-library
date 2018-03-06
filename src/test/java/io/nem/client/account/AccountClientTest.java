@@ -9,7 +9,7 @@ import io.nem.client.account.response.harvest.HarvestInfo;
 import io.nem.client.account.response.history.HistoryResponse;
 import io.nem.client.account.response.importance.ImportanceResponse;
 import io.nem.client.common.KeyPair;
-import io.nem.client.mosaic.response.MosaicId;
+import io.nem.client.common.MosaicId;
 import io.nem.client.account.response.mosaic.MosaicsResponse;
 import io.nem.client.account.response.mosaic.OwnedMosaic;
 import io.nem.client.account.response.mosaic.OwnedMosaicsResponse;
@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 class AccountClientTest {
 
-    private final AccountClient accountClient = new DefaultNemClientFactory().createAccountClient("http://153.122.112.137:7890");
+    private final AccountClient accountClient = new DefaultNemClientFactory().createAccountClient("http://127.0.0.1:7890");
 
     private final String address = "TAVNDWBJFJHZYD3YYWJPDQ345ZAZIYEB2LJXSG65";
     private final String cosignatoryAddress = "TBNDMABIECCN6EQY5WVNJZMCXAUVTN7RKGZH4CP4";
@@ -226,7 +226,7 @@ class AccountClientTest {
     @Test
     void getOwnedMosaics() {
         List<OwnedMosaic> expectedOwnedMosaics = new ArrayList<>();
-        expectedOwnedMosaics.add(new OwnedMosaic(new MosaicId("nem", "xem"), 1.3E7));
+        expectedOwnedMosaics.add(new OwnedMosaic(new MosaicId("nem", "xem"), 13000000));
         OwnedMosaicsResponse ownedMosaicsResponse = accountClient.ownedMosaics(address);
         assertEquals(expectedOwnedMosaics, ownedMosaicsResponse.data);
     }

@@ -75,7 +75,9 @@ public class DefaultNemClientFactory implements NemClientFactory {
         HexConverter hexConverter = new DefaultHexConverter();
         TransactionEncoder transactionEncoder = new ByteArrayTransactionEncoder(byteSerializer, hexConverter);
         VersionProvider versionProvider = new DefaultVersionProvider();
-        FeeProvider feeProvider = new DefaultFeeProvider();
+        MosaicClient mosaicClient = createMosaicClient(nodeUrl);
+        AccountClient accountClient = createAccountClient(nodeUrl);
+        FeeProvider feeProvider = new DefaultFeeProvider(mosaicClient, accountClient);
         NodeClient nodeClient = createNodeClient(nodeUrl);
 
         return new SecureTransactionClient(network, feignTransactionClient, transactionEncoder, hexConverter, versionProvider, feeProvider, nodeClient);

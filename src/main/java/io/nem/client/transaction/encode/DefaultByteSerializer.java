@@ -1,9 +1,10 @@
 package io.nem.client.transaction.encode;
 
-import com.google.common.primitives.Bytes;
 import io.nem.client.common.Message;
+import io.nem.client.common.MosaicTransfer;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static com.google.common.primitives.Bytes.concat;
 import static java.nio.ByteBuffer.allocate;
 import static java.nio.ByteOrder.LITTLE_ENDIAN;
 import static java.nio.charset.Charset.forName;
@@ -37,7 +38,17 @@ public class DefaultByteSerializer implements ByteSerializer {
             return new byte[0];
         }
         byte[] payload = getUTF8Bytes(message.payload);
-        return Bytes.concat(intToByte(message.type), intToByte(payload.length), payload);
+        return concat(intToByte(message.type), intToByte(payload.length), payload);
+    }
+
+    @Override
+    public byte[] mosaicToByte(MosaicTransfer mosaicTransfer) {
+        byte[] namespaceIdBytes = getUTF8Bytes(mosaicTransfer.mosaicId.namespaceId);
+        byte[] mosaicNameBytes = getUTF8Bytes(mosaicTransfer.mosaicId.name);
+        byte[] quantityBytes = longToByte(mosaicTransfer.quantity);
+        byte[] mosaicIdStructure = concat(intToByte(namespaceIdBytes.length), namespaceIdBytes, intToByte(mosaicNameBytes.length), mosaicNameBytes);
+        byte[] mosaicStructure = concat(intToByte(mosaicIdStructure.length), mosaicIdStructure, quantityBytes);
+        return concat(intToByte(mosaicStructure.length), mosaicStructure);
     }
 
     private byte[] getUTF8Bytes(String address) {

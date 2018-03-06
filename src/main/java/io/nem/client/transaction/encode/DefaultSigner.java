@@ -1,20 +1,19 @@
 package io.nem.client.transaction.encode;
 
-import org.nem.core.crypto.CryptoEngines;
 import org.nem.core.crypto.DsaSigner;
 import org.nem.core.crypto.KeyPair;
-import org.nem.core.crypto.PrivateKey;
 
-import static org.nem.core.utils.ArrayUtils.toBigInteger;
+import static org.nem.core.crypto.CryptoEngines.defaultEngine;
+import static org.nem.core.crypto.PrivateKey.fromHexString;
 
 public class DefaultSigner implements Signer {
 
     private final DsaSigner dsaSigner;
     private final KeyPair cryptoKeyPair;
 
-    public DefaultSigner(byte[] privateKey) {
-        cryptoKeyPair = new KeyPair(new PrivateKey(toBigInteger(privateKey)));
-        dsaSigner = CryptoEngines.defaultEngine().createDsaSigner(cryptoKeyPair);
+    public DefaultSigner(String hexString) {
+        cryptoKeyPair = new KeyPair(fromHexString(hexString));
+        dsaSigner = defaultEngine().createDsaSigner(cryptoKeyPair);
     }
 
     @Override

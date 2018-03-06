@@ -1,4 +1,4 @@
-package io.nem.client.mosaic.response;
+package io.nem.client.common;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

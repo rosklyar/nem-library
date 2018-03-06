@@ -1,20 +1,20 @@
-package io.nem.client.account.response.mosaic;
+package io.nem.client.common;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.nem.client.common.MosaicId;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 @EqualsAndHashCode
 @ToString
-public class OwnedMosaic {
+public class MosaicTransfer {
 
     public final MosaicId mosaicId;
     public final long quantity;
 
     @JsonCreator
-    public OwnedMosaic(@JsonProperty("mosaicId") MosaicId mosaicId, @JsonProperty("quantity") long quantity) {
+    public MosaicTransfer(@JsonProperty("mosaicId") MosaicId mosaicId,
+                          @JsonProperty("quantity") long quantity) {
         this.mosaicId = mosaicId;
         this.quantity = quantity;
     }

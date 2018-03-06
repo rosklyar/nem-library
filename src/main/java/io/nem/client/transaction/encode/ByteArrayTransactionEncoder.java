@@ -1,7 +1,9 @@
 package io.nem.client.transaction.encode;
 
-import com.google.common.primitives.Bytes;
-import io.nem.client.transaction.Transaction;
+import io.nem.client.common.Transaction;
+
+import static com.google.common.primitives.Bytes.concat;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
 public class ByteArrayTransactionEncoder implements TransactionEncoder {
 
@@ -19,8 +21,9 @@ public class ByteArrayTransactionEncoder implements TransactionEncoder {
     @Override
     public byte[] data(Transaction transaction) {
         byte[] message = byteSerializer.messageToByte(transaction.message);
+        byte[] mosaics = getAllMosaicsBytes(transaction);
         return
-                Bytes.concat(
+                concat(
                         byteSerializer.intToByte(transaction.type),
                         byteSerializer.intToByte(transaction.version),
                         byteSerializer.intToByte(transaction.timeStamp),
@@ -32,7 +35,17 @@ public class ByteArrayTransactionEncoder implements TransactionEncoder {
                         byteSerializer.addressToByte(transaction.recipient),
                         byteSerializer.longToByte(transaction.amount),
                         byteSerializer.intToByte(message.length),
-                        message
+                        message,
+                        mosaics
                 );
+    }
+
+    private byte[] getAllMosaicsBytes(Transaction transaction) {
+        byte[] emptyArray = new byte[0];
+        return isEmpty(transaction.mosaics) ?
+                emptyArray :
+                transaction.mosaics.stream()
+                        .map(byteSerializer::mosaicToByte)
+                        .reduce(byteSerializer.intToByte(transaction.mosaics.size()), (b1, b2) -> concat(b1, b2));
     }
 }

@@ -2,6 +2,7 @@ package io.nem.client.mosaic.response;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import io.nem.client.common.MosaicId;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
