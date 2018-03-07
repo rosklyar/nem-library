@@ -21,22 +21,38 @@ public class ByteArrayTransactionEncoder implements TransactionEncoder {
 
     @Override
     public byte[] data(Transaction transaction) {
+        byte[] commonTransactionPart = commonTransactionPart(transaction);
         byte[] transferPart = getTransferPartData(transaction);
         byte[] mosaicsPart = getAllMosaicsBytes(transaction);
         byte[] multisigAccountCreationPart = getAggregateModificationPart(transaction);
+        byte[] otherTransactionPart = otherTransactionPart(transaction.otherTrans);
         return
                 concat(
-                        byteSerializer.intToByte(transaction.type),
-                        byteSerializer.intToByte(transaction.version),
-                        byteSerializer.intToByte(transaction.timeStamp),
-                        byteSerializer.intToByte(numberOfBytesInPublicKey),
-                        hexConverter.getBytes(transaction.signer),
-                        byteSerializer.longToByte(transaction.fee),
-                        byteSerializer.intToByte(transaction.deadline),
+                        commonTransactionPart,
                         transferPart,
                         mosaicsPart,
-                        multisigAccountCreationPart
+                        multisigAccountCreationPart,
+                        otherTransactionPart
                 );
+    }
+
+    private byte[] commonTransactionPart(Transaction transaction) {
+        return concat(
+                byteSerializer.intToByte(transaction.type),
+                byteSerializer.intToByte(transaction.version),
+                byteSerializer.intToByte(transaction.timeStamp),
+                byteSerializer.intToByte(numberOfBytesInPublicKey),
+                hexConverter.getBytes(transaction.signer),
+                byteSerializer.longToByte(transaction.fee),
+                byteSerializer.intToByte(transaction.deadline));
+    }
+
+    private byte[] otherTransactionPart(Transaction transaction) {
+        if (transaction == null) {
+            return new byte[0];
+        }
+        byte[] transactionData = data(transaction);
+        return concat(byteSerializer.intToByte(transactionData.length), transactionData);
     }
 
     private byte[] getAggregateModificationPart(Transaction transaction) {

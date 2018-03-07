@@ -51,20 +51,11 @@ public class SecureTransactionClient implements TransactionClient {
     public NemAnnounceResult transferNem(String privateKey, String toAddress, long microXemAmount, String message, int timeToLiveInSeconds) {
 
         Signer signer = new DefaultSigner(privateKey);
+        String publicKey = signer.publicKey();
 
         int currentTime = nodeClient.extendedInfo().nisInfo.currentTime;
 
-        Transaction transaction = Transaction.builder()
-                .type(TRANSFER_NEM.type)
-                .version(versionProvider.version(network, TRANSFER_NEM))
-                .timeStamp(currentTime)
-                .signer(signer.publicKey())
-                .fee(feeProvider.fee(microXemAmount, message))
-                .deadline(currentTime + timeToLiveInSeconds)
-                .recipient(toAddress)
-                .amount(microXemAmount)
-                .message(new Message(message, 1))
-                .build();
+        Transaction transaction = transferNemTransaction(toAddress, microXemAmount, message, timeToLiveInSeconds, publicKey, currentTime);
 
         byte[] data = transactionEncoder.data(transaction);
         return feignTransactionClient.prepare(new RequestAnnounce(hexConverter.getString(data), signer.sign(data)));
@@ -116,5 +107,40 @@ public class SecureTransactionClient implements TransactionClient {
         byte[] data = transactionEncoder.data(transaction);
 
         return feignTransactionClient.prepare(new RequestAnnounce(hexConverter.getString(data), signer.sign(data)));
+    }
+
+    @Override
+    public NemAnnounceResult multisigTransferNem(String privateKey, String multisigPublicKey, String toAddress, long microXemAmount, String message, int timeToLiveInSeconds) {
+        Signer signer = new DefaultSigner(privateKey);
+        int currentTime = nodeClient.extendedInfo().nisInfo.currentTime;
+
+        Transaction transferTransaction = transferNemTransaction(toAddress, microXemAmount, message, timeToLiveInSeconds, multisigPublicKey, currentTime);
+        Transaction transaction = Transaction.builder()
+                .type(MULTISIG_TRANSACTION.type)
+                .version(versionProvider.version(network, MULTISIG_TRANSACTION))
+                .timeStamp(currentTime)
+                .signer(signer.publicKey())
+                .fee(feeProvider.multisigTransactionFee())
+                .deadline(currentTime + timeToLiveInSeconds)
+                .otherTrans(transferTransaction)
+                .build();
+
+        byte[] data = transactionEncoder.data(transaction);
+
+        return feignTransactionClient.prepare(new RequestAnnounce(hexConverter.getString(data), signer.sign(data)));
+    }
+
+    private Transaction transferNemTransaction(String toAddress, long microXemAmount, String message, int timeToLiveInSeconds, String publicKey, int currentTime) {
+        return Transaction.builder()
+                .type(TRANSFER_NEM.type)
+                .version(versionProvider.version(network, TRANSFER_NEM))
+                .timeStamp(currentTime)
+                .signer(publicKey)
+                .fee(feeProvider.fee(microXemAmount, message))
+                .deadline(currentTime + timeToLiveInSeconds)
+                .recipient(toAddress)
+                .amount(microXemAmount)
+                .message(new Message(message, 1))
+                .build();
     }
 }

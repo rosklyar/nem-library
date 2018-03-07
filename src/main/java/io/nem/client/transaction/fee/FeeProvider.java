@@ -10,4 +10,6 @@ public interface FeeProvider {
     long fee(List<MosaicTransfer> mosaics, int times, String payload);
 
     long multisigAccountCreationFee();
+
+    long multisigTransactionFee();
 }

@@ -57,4 +57,18 @@ class TransactionClientTest {
         );
         assertEquals(1, nemAnnounceResult.code);
     }
+
+    @Test
+    @Disabled
+    void multisigTransfer() {
+        NemAnnounceResult nemAnnounceResult = transactionClient.multisigTransferNem(
+                "2ee2a08ad2ebc1371330c9977d15e52f482aa514554e085bec5ed076e8b11581",
+                "d9728f3002d6292d54aa2e5c75f1e72bb7f7b800645c46e91171935285e77747",
+                "TCHCCSUCSBE2OSYXLISPYGOVLOVZYCYYI5V73K4Y",
+                1000000,
+                "test multisig",
+                3600
+        );
+        assertEquals(1, nemAnnounceResult.code);
+    }
 }
