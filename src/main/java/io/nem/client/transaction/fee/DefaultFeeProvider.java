@@ -55,6 +55,11 @@ public class DefaultFeeProvider implements FeeProvider {
         return 3L * feeUnit;
     }
 
+    @Override
+    public long cosigningFee() {
+        return 3L * feeUnit;
+    }
+
     private long mosaicFee(MosaicTransfer mosaicTransfer, int times) {
         String namespaceId = mosaicTransfer.mosaicId.namespaceId;
         String mosaicName = mosaicTransfer.mosaicId.name;

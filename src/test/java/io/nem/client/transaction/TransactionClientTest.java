@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import static com.google.common.collect.Lists.newArrayList;
 import static io.nem.client.transaction.version.Network.TEST;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class TransactionClientTest {
 
@@ -60,7 +61,7 @@ class TransactionClientTest {
 
     @Test
     @Disabled
-    void multisigTransfer() {
+    void multisigNemTransfer() {
         NemAnnounceResult nemAnnounceResult = transactionClient.multisigTransferNem(
                 "2ee2a08ad2ebc1371330c9977d15e52f482aa514554e085bec5ed076e8b11581",
                 "d9728f3002d6292d54aa2e5c75f1e72bb7f7b800645c46e91171935285e77747",
@@ -68,6 +69,24 @@ class TransactionClientTest {
                 1000000,
                 "test multisig",
                 3600
+        );
+        assertNotNull(nemAnnounceResult.innerTransactionHash);
+
+        NemAnnounceResult cosignNemAnnounceResult = transactionClient.cosignTransaction("fcf0dadc958510dca65651df81aa22c82b2bfe5b29bf8dfb92816bc5f1f11a54", nemAnnounceResult.innerTransactionHash.data, "TD4F657BT4MDBAJXMOZR37MN5T2CRXQW66MPSONE", 3600);
+        assertEquals(1, cosignNemAnnounceResult.code);
+    }
+
+    @Test
+    @Disabled
+    void multisigMosaicTransfer() {
+        NemAnnounceResult nemAnnounceResult = transactionClient.multisigTransferMosaics(
+                "2ee2a08ad2ebc1371330c9977d15e52f482aa514554e085bec5ed076e8b11581",
+                "d9728f3002d6292d54aa2e5c75f1e72bb7f7b800645c46e91171935285e77747",
+                "TCHCCSUCSBE2OSYXLISPYGOVLOVZYCYYI5V73K4Y",
+                "test multisig",
+                3600,
+                newArrayList(new MosaicTransfer(new MosaicId("library", "testcoin"), 3000)),
+                2
         );
         assertEquals(1, nemAnnounceResult.code);
     }

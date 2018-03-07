@@ -32,6 +32,8 @@ public class Transaction {
     public final Transaction otherTrans;
     public final List<Signature> signatures;
     public final List<MosaicTransfer> mosaics;
+    public final String otherAccount;
+    public final Hash otherHash;
 
     @JsonPOJOBuilder(withPrefix = "")
     public static class TransactionBuilder {

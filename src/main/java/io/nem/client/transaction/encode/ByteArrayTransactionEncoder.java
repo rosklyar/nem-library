@@ -10,7 +10,8 @@ public class ByteArrayTransactionEncoder implements TransactionEncoder {
     private final ByteSerializer byteSerializer;
     private final HexConverter hexConverter;
     private final int numberOfBytesInPublicKey = 32;
-    private final int numberOfBytesInRecipient = 40;
+    private final int numberOfBytesInHash = 32;
+    private final int numberOfBytesInAddress = 40;
     private final int lengthOfMinCosignatoriesStructure = 4;
 
     public ByteArrayTransactionEncoder(ByteSerializer byteSerializer, HexConverter hexEncoder) {
@@ -24,16 +25,31 @@ public class ByteArrayTransactionEncoder implements TransactionEncoder {
         byte[] commonTransactionPart = commonTransactionPart(transaction);
         byte[] transferPart = getTransferPartData(transaction);
         byte[] mosaicsPart = getAllMosaicsBytes(transaction);
-        byte[] multisigAccountCreationPart = getAggregateModificationPart(transaction);
+        byte[] multisigAggregateModificationPart = getAggregateModificationPart(transaction);
         byte[] otherTransactionPart = otherTransactionPart(transaction.otherTrans);
+        byte[] cosigningTransactionPart = cosigningTransactionPart(transaction);
         return
                 concat(
                         commonTransactionPart,
                         transferPart,
                         mosaicsPart,
-                        multisigAccountCreationPart,
+                        multisigAggregateModificationPart,
+                        cosigningTransactionPart,
                         otherTransactionPart
                 );
+    }
+
+    private byte[] cosigningTransactionPart(Transaction transaction) {
+        if (transaction.otherHash == null) {
+            return new byte[0];
+        }
+        return concat(
+                byteSerializer.intToByte(numberOfBytesInHash + 4),
+                byteSerializer.intToByte(numberOfBytesInHash),
+                hexConverter.getBytes(transaction.otherHash.data),
+                byteSerializer.intToByte(numberOfBytesInAddress),
+                byteSerializer.addressToByte(transaction.otherAccount)
+        );
     }
 
     private byte[] commonTransactionPart(Transaction transaction) {
@@ -74,7 +90,7 @@ public class ByteArrayTransactionEncoder implements TransactionEncoder {
     private byte[] getTransferPartData(Transaction transaction) {
         byte[] messagePart = byteSerializer.messageToByte(transaction.message);
         return transaction.recipient == null ? new byte[0] : concat(
-                byteSerializer.intToByte(numberOfBytesInRecipient),
+                byteSerializer.intToByte(numberOfBytesInAddress),
                 byteSerializer.addressToByte(transaction.recipient),
                 byteSerializer.longToByte(transaction.amount),
                 byteSerializer.intToByte(messagePart.length),

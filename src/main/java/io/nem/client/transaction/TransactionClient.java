@@ -15,4 +15,8 @@ public interface TransactionClient {
 
     NemAnnounceResult multisigTransferNem(String privateKey, String multisigPublicKey, String toAddress, long microXemAmount, String message, int timeToLiveInSeconds);
 
+    NemAnnounceResult multisigTransferMosaics(String privateKey, String multisigPublicKey, String toAddress, String message, int timeToLiveInSeconds, List<MosaicTransfer> mosaics, int times);
+
+    NemAnnounceResult cosignTransaction(String privateKey, String transactionHash, String multisigAddress, int timeToLiveInSeconds);
+
 }

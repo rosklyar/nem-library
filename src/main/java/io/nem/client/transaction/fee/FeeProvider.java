@@ -12,4 +12,6 @@ public interface FeeProvider {
     long multisigAccountCreationFee();
 
     long multisigTransactionFee();
+
+    long cosigningFee();
 }
