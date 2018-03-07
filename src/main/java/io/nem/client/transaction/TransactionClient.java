@@ -19,4 +19,6 @@ public interface TransactionClient {
 
     NemAnnounceResult cosignTransaction(String privateKey, String transactionHash, String multisigAddress, int timeToLiveInSeconds);
 
+    NemAnnounceResult createNamespace(String privateKey, String parentNamespace, String namespace, int timeToLiveInSeconds);
+
 }

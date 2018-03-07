@@ -4,7 +4,7 @@ import io.nem.client.common.MosaicTransfer;
 
 import java.util.List;
 
-public interface FeeProvider {
+public interface FeeCalculator {
     long fee(long microXemAmount, String payload);
 
     long fee(List<MosaicTransfer> mosaics, int times, String payload);
@@ -14,4 +14,8 @@ public interface FeeProvider {
     long multisigTransactionFee();
 
     long cosigningFee();
+
+    long namespaceProvisionFee();
+
+    long rentalFee(String parent, String namespace);
 }

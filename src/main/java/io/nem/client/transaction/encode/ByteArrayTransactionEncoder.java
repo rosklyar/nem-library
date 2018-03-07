@@ -1,7 +1,9 @@
 package io.nem.client.transaction.encode;
 
+import io.nem.client.common.ProvisionNamespaceTransaction;
 import io.nem.client.common.Transaction;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.primitives.Bytes.concat;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
@@ -13,6 +15,7 @@ public class ByteArrayTransactionEncoder implements TransactionEncoder {
     private final int numberOfBytesInHash = 32;
     private final int numberOfBytesInAddress = 40;
     private final int lengthOfMinCosignatoriesStructure = 4;
+    private final int nullBytesSentinelValue = 0xFFFFFFFF;
 
     public ByteArrayTransactionEncoder(ByteSerializer byteSerializer, HexConverter hexEncoder) {
         this.byteSerializer = byteSerializer;
@@ -39,6 +42,26 @@ public class ByteArrayTransactionEncoder implements TransactionEncoder {
                 );
     }
 
+    @Override
+    public byte[] data(ProvisionNamespaceTransaction transaction) {
+        byte[] parentNamespacePart = isNullOrEmpty(transaction.parent) ?
+                byteSerializer.intToByte(nullBytesSentinelValue) :
+                concat(
+                        byteSerializer.intToByte(transaction.parent.length()),
+                        byteSerializer.stringToBytes(transaction.parent)
+                );
+
+        return concat(
+                commonTransactionPart(transaction),
+                byteSerializer.intToByte(numberOfBytesInAddress),
+                byteSerializer.stringToBytes(transaction.rentalFeeSink),
+                byteSerializer.longToByte(transaction.rentalFee),
+                byteSerializer.intToByte(transaction.newPart.length()),
+                byteSerializer.stringToBytes(transaction.newPart),
+                parentNamespacePart
+        );
+    }
+
     private byte[] cosigningTransactionPart(Transaction transaction) {
         if (transaction.otherHash == null) {
             return new byte[0];
@@ -48,11 +71,22 @@ public class ByteArrayTransactionEncoder implements TransactionEncoder {
                 byteSerializer.intToByte(numberOfBytesInHash),
                 hexConverter.getBytes(transaction.otherHash.data),
                 byteSerializer.intToByte(numberOfBytesInAddress),
-                byteSerializer.addressToByte(transaction.otherAccount)
+                byteSerializer.stringToBytes(transaction.otherAccount)
         );
     }
 
     private byte[] commonTransactionPart(Transaction transaction) {
+        return concat(
+                byteSerializer.intToByte(transaction.type),
+                byteSerializer.intToByte(transaction.version),
+                byteSerializer.intToByte(transaction.timeStamp),
+                byteSerializer.intToByte(numberOfBytesInPublicKey),
+                hexConverter.getBytes(transaction.signer),
+                byteSerializer.longToByte(transaction.fee),
+                byteSerializer.intToByte(transaction.deadline));
+    }
+
+    private byte[] commonTransactionPart(ProvisionNamespaceTransaction transaction) {
         return concat(
                 byteSerializer.intToByte(transaction.type),
                 byteSerializer.intToByte(transaction.version),
@@ -91,7 +125,7 @@ public class ByteArrayTransactionEncoder implements TransactionEncoder {
         byte[] messagePart = byteSerializer.messageToByte(transaction.message);
         return transaction.recipient == null ? new byte[0] : concat(
                 byteSerializer.intToByte(numberOfBytesInAddress),
-                byteSerializer.addressToByte(transaction.recipient),
+                byteSerializer.stringToBytes(transaction.recipient),
                 byteSerializer.longToByte(transaction.amount),
                 byteSerializer.intToByte(messagePart.length),
                 messagePart);

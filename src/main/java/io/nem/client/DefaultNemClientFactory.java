@@ -17,8 +17,8 @@ import io.nem.client.transaction.FeignTransactionClient;
 import io.nem.client.transaction.SecureTransactionClient;
 import io.nem.client.transaction.TransactionClient;
 import io.nem.client.transaction.encode.*;
-import io.nem.client.transaction.fee.DefaultFeeProvider;
-import io.nem.client.transaction.fee.FeeProvider;
+import io.nem.client.transaction.fee.DefaultFeeCalculator;
+import io.nem.client.transaction.fee.FeeCalculator;
 import io.nem.client.transaction.version.DefaultVersionProvider;
 import io.nem.client.transaction.version.Network;
 import io.nem.client.transaction.version.VersionProvider;
@@ -77,9 +77,9 @@ public class DefaultNemClientFactory implements NemClientFactory {
         VersionProvider versionProvider = new DefaultVersionProvider();
         MosaicClient mosaicClient = createMosaicClient(nodeUrl);
         AccountClient accountClient = createAccountClient(nodeUrl);
-        FeeProvider feeProvider = new DefaultFeeProvider(mosaicClient, accountClient);
+        FeeCalculator feeCalculator = new DefaultFeeCalculator(mosaicClient, accountClient);
         NodeClient nodeClient = createNodeClient(nodeUrl);
 
-        return new SecureTransactionClient(network, feignTransactionClient, transactionEncoder, hexConverter, versionProvider, feeProvider, nodeClient);
+        return new SecureTransactionClient(network, feignTransactionClient, transactionEncoder, hexConverter, versionProvider, feeCalculator, nodeClient);
     }
 }

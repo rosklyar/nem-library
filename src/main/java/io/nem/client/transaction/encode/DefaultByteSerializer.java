@@ -36,8 +36,8 @@ public class DefaultByteSerializer implements ByteSerializer {
     }
 
     @Override
-    public byte[] addressToByte(String address) {
-        return getUTF8Bytes(address);
+    public byte[] stringToBytes(String string) {
+        return getUTF8Bytes(string);
     }
 
     @Override

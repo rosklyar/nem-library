@@ -9,7 +9,7 @@ public interface ByteSerializer {
 
     byte[] longToByte(long number);
 
-    byte[] addressToByte(String string);
+    byte[] stringToBytes(String string);
 
     byte[] messageToByte(Message message);
 

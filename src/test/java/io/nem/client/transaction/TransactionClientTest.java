@@ -90,4 +90,24 @@ class TransactionClientTest {
         );
         assertEquals(1, nemAnnounceResult.code);
     }
+
+    @Test
+    @Disabled
+    void namespaceProvision() {
+        NemAnnounceResult nemAnnounceResult = transactionClient.createNamespace(
+                "fcf0dadc958510dca65651df81aa22c82b2bfe5b29bf8dfb92816bc5f1f11a54",
+                null,
+                "testlibrary",
+                3600
+        );
+        assertEquals(1, nemAnnounceResult.code);
+
+        NemAnnounceResult secondNemAnnounceResult = transactionClient.createNamespace(
+                "fcf0dadc958510dca65651df81aa22c82b2bfe5b29bf8dfb92816bc5f1f11a54",
+                "testlibrary",
+                "innertestlibrary",
+                3600
+        );
+        assertEquals(1, secondNemAnnounceResult.code);
+    }
 }

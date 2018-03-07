@@ -16,7 +16,7 @@ import static java.math.BigInteger.TEN;
 import static java.math.BigInteger.valueOf;
 import static java.math.RoundingMode.DOWN;
 
-public class DefaultFeeProvider implements FeeProvider {
+public class DefaultFeeCalculator implements FeeCalculator {
 
     private final int feeUnit = 50000;
     private final long maxMosaicQuantity = 9000000000000000L;
@@ -26,7 +26,7 @@ public class DefaultFeeProvider implements FeeProvider {
     private final MosaicClient mosaicClient;
     private final AccountClient accountClient;
 
-    public DefaultFeeProvider(MosaicClient mosaicClient, AccountClient accountClient) {
+    public DefaultFeeCalculator(MosaicClient mosaicClient, AccountClient accountClient) {
         this.mosaicClient = mosaicClient;
         this.accountClient = accountClient;
     }
@@ -58,6 +58,17 @@ public class DefaultFeeProvider implements FeeProvider {
     @Override
     public long cosigningFee() {
         return 3L * feeUnit;
+    }
+
+    @Override
+    public long namespaceProvisionFee() {
+        return 3L * feeUnit;
+    }
+
+    @Override
+    public long rentalFee(String parent, String namespace) {
+        long microXemsInXem = TEN.pow(nemDivisibility).longValue();
+        return isNullOrEmpty(parent) ? 100L * microXemsInXem : 10 * microXemsInXem;
     }
 
     private long mosaicFee(MosaicTransfer mosaicTransfer, int times) {

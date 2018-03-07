@@ -1,9 +1,6 @@
 package io.nem.client.transaction;
 
-import io.nem.client.common.Hash;
-import io.nem.client.common.Message;
-import io.nem.client.common.MosaicTransfer;
-import io.nem.client.common.Transaction;
+import io.nem.client.common.*;
 import io.nem.client.common.multisig.Modification;
 import io.nem.client.common.multisig.RelativeChange;
 import io.nem.client.node.NodeClient;
@@ -11,7 +8,7 @@ import io.nem.client.transaction.encode.DefaultSigner;
 import io.nem.client.transaction.encode.HexConverter;
 import io.nem.client.transaction.encode.Signer;
 import io.nem.client.transaction.encode.TransactionEncoder;
-import io.nem.client.transaction.fee.FeeProvider;
+import io.nem.client.transaction.fee.FeeCalculator;
 import io.nem.client.transaction.request.RequestAnnounce;
 import io.nem.client.transaction.response.NemAnnounceResult;
 import io.nem.client.transaction.version.Network;
@@ -30,7 +27,7 @@ public class SecureTransactionClient implements TransactionClient {
     private final TransactionEncoder transactionEncoder;
     private final HexConverter hexConverter;
     private final VersionProvider versionProvider;
-    private final FeeProvider feeProvider;
+    private final FeeCalculator feeCalculator;
     private final NodeClient nodeClient;
 
     public SecureTransactionClient(Network network,
@@ -38,13 +35,13 @@ public class SecureTransactionClient implements TransactionClient {
                                    TransactionEncoder transactionEncoder,
                                    HexConverter hexConverter,
                                    VersionProvider versionProvider,
-                                   FeeProvider feeProvider, NodeClient nodeClient) {
+                                   FeeCalculator feeCalculator, NodeClient nodeClient) {
         this.network = network;
         this.feignTransactionClient = feignTransactionClient;
         this.transactionEncoder = transactionEncoder;
         this.hexConverter = hexConverter;
         this.versionProvider = versionProvider;
-        this.feeProvider = feeProvider;
+        this.feeCalculator = feeCalculator;
         this.nodeClient = nodeClient;
     }
 
@@ -89,7 +86,7 @@ public class SecureTransactionClient implements TransactionClient {
                 .version(versionProvider.version(network, MULTISIG_AGGREGATE_MODIFICATION))
                 .timeStamp(currentTime)
                 .signer(signer.publicKey())
-                .fee(feeProvider.multisigAccountCreationFee())
+                .fee(feeCalculator.multisigAccountCreationFee())
                 .deadline(currentTime + timeToLiveInSeconds)
                 .modifications(cosignatories.stream().map(publicKey -> new Modification(1, publicKey)).collect(toList()))
                 .minCosignatories(new RelativeChange(minCosignatories))
@@ -111,7 +108,7 @@ public class SecureTransactionClient implements TransactionClient {
                 .version(versionProvider.version(network, MULTISIG_TRANSACTION))
                 .timeStamp(currentTime)
                 .signer(signer.publicKey())
-                .fee(feeProvider.multisigTransactionFee())
+                .fee(feeCalculator.multisigTransactionFee())
                 .deadline(currentTime + timeToLiveInSeconds)
                 .otherTrans(transferTransaction)
                 .build();
@@ -133,7 +130,7 @@ public class SecureTransactionClient implements TransactionClient {
                 .version(versionProvider.version(network, MULTISIG_TRANSACTION))
                 .timeStamp(currentTime)
                 .signer(signer.publicKey())
-                .fee(feeProvider.multisigTransactionFee())
+                .fee(feeCalculator.multisigTransactionFee())
                 .deadline(currentTime + timeToLiveInSeconds)
                 .otherTrans(transferTransaction)
                 .build();
@@ -153,10 +150,33 @@ public class SecureTransactionClient implements TransactionClient {
                 .version(versionProvider.version(network, MULTISIG_SIGNATURE))
                 .timeStamp(currentTime)
                 .signer(signer.publicKey())
-                .fee(feeProvider.cosigningFee())
+                .fee(feeCalculator.cosigningFee())
                 .deadline(currentTime + timeToLiveInSeconds)
                 .otherAccount(multisigAddress)
                 .otherHash(new Hash(transactionHash))
+                .build();
+
+        byte[] data = transactionEncoder.data(transaction);
+
+        return feignTransactionClient.prepare(new RequestAnnounce(hexConverter.getString(data), signer.sign(data)));
+    }
+
+    @Override
+    public NemAnnounceResult createNamespace(String privateKey, String parentNamespace, String namespace, int timeToLiveInSeconds) {
+        Signer signer = new DefaultSigner(privateKey);
+        int currentTime = nodeClient.extendedInfo().nisInfo.currentTime;
+
+        ProvisionNamespaceTransaction transaction = ProvisionNamespaceTransaction.builder()
+                .type(PROVISION_NAMESPACE.type)
+                .version(versionProvider.version(network, PROVISION_NAMESPACE))
+                .timeStamp(currentTime)
+                .signer(signer.publicKey())
+                .fee(feeCalculator.namespaceProvisionFee())
+                .deadline(currentTime + timeToLiveInSeconds)
+                .rentalFeeSink(network.rentalFeeSink)
+                .rentalFee(feeCalculator.rentalFee(parentNamespace, namespace))
+                .parent(parentNamespace)
+                .newPart(namespace)
                 .build();
 
         byte[] data = transactionEncoder.data(transaction);
@@ -170,7 +190,7 @@ public class SecureTransactionClient implements TransactionClient {
                 .version(versionProvider.version(network, TRANSFER_NEM))
                 .timeStamp(currentTime)
                 .signer(publicKey)
-                .fee(feeProvider.fee(microXemAmount, message))
+                .fee(feeCalculator.fee(microXemAmount, message))
                 .deadline(currentTime + timeToLiveInSeconds)
                 .recipient(toAddress)
                 .amount(microXemAmount)
@@ -184,7 +204,7 @@ public class SecureTransactionClient implements TransactionClient {
                 .version(versionProvider.version(network, TRANSFER_MOSAICS))
                 .timeStamp(currentTime)
                 .signer(publicKey)
-                .fee(feeProvider.fee(mosaics, times, message))
+                .fee(feeCalculator.fee(mosaics, times, message))
                 .deadline(currentTime + timeToLiveInSeconds)
                 .recipient(toAddress)
                 .amount(times * TEN.pow(6).longValue())
