@@ -71,8 +71,8 @@ public class DefaultNemClientFactory implements NemClientFactory {
                 .encoder(new JacksonEncoder())
                 .decoder(new JacksonDecoder())
                 .target(FeignTransactionClient.class, nodeUrl);
-        ByteSerializer byteSerializer = new DefaultByteSerializer();
         HexConverter hexConverter = new DefaultHexConverter();
+        ByteSerializer byteSerializer = new DefaultByteSerializer(hexConverter);
         TransactionEncoder transactionEncoder = new ByteArrayTransactionEncoder(byteSerializer, hexConverter);
         VersionProvider versionProvider = new DefaultVersionProvider();
         MosaicClient mosaicClient = createMosaicClient(nodeUrl);

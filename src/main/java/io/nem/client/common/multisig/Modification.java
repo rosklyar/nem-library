@@ -1,4 +1,4 @@
-package io.nem.client.account.response;
+package io.nem.client.common.multisig;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

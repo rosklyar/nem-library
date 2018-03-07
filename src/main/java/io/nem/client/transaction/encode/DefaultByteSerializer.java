@@ -2,6 +2,7 @@ package io.nem.client.transaction.encode;
 
 import io.nem.client.common.Message;
 import io.nem.client.common.MosaicTransfer;
+import io.nem.client.common.multisig.Modification;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.primitives.Bytes.concat;
@@ -10,6 +11,13 @@ import static java.nio.ByteOrder.LITTLE_ENDIAN;
 import static java.nio.charset.Charset.forName;
 
 public class DefaultByteSerializer implements ByteSerializer {
+
+    private final int numberOfBytesInPublicKey = 32;
+    private final HexConverter hexConverter;
+
+    public DefaultByteSerializer(HexConverter hexConverter) {
+        this.hexConverter = hexConverter;
+    }
 
     @Override
     public byte[] intToByte(int number) {
@@ -49,6 +57,16 @@ public class DefaultByteSerializer implements ByteSerializer {
         byte[] mosaicIdStructure = concat(intToByte(namespaceIdBytes.length), namespaceIdBytes, intToByte(mosaicNameBytes.length), mosaicNameBytes);
         byte[] mosaicStructure = concat(intToByte(mosaicIdStructure.length), mosaicIdStructure, quantityBytes);
         return concat(intToByte(mosaicStructure.length), mosaicStructure);
+    }
+
+    @Override
+    public byte[] modificationToByte(Modification modification) {
+        byte[] modificationStructureData = concat(
+                intToByte(modification.modificationType),
+                intToByte(numberOfBytesInPublicKey),
+                hexConverter.getBytes(modification.cosignatoryAccount)
+        );
+        return concat(intToByte(modificationStructureData.length), modificationStructureData);
     }
 
     private byte[] getUTF8Bytes(String address) {

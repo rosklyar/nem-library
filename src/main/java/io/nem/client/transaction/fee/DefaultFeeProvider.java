@@ -45,6 +45,11 @@ public class DefaultFeeProvider implements FeeProvider {
         return (mosaicsFee + messageFee) * feeUnit;
     }
 
+    @Override
+    public long multisigAccountCreationFee() {
+        return 10L * feeUnit;
+    }
+
     private long mosaicFee(MosaicTransfer mosaicTransfer, int times) {
         String namespaceId = mosaicTransfer.mosaicId.namespaceId;
         String mosaicName = mosaicTransfer.mosaicId.name;

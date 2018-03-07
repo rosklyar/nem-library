@@ -8,4 +8,6 @@ public interface FeeProvider {
     long fee(long microXemAmount, String payload);
 
     long fee(List<MosaicTransfer> mosaics, int times, String payload);
+
+    long multisigAccountCreationFee();
 }

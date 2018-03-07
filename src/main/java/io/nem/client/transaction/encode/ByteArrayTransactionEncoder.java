@@ -11,6 +11,7 @@ public class ByteArrayTransactionEncoder implements TransactionEncoder {
     private final HexConverter hexConverter;
     private final int numberOfBytesInPublicKey = 32;
     private final int numberOfBytesInRecipient = 40;
+    private final int lengthOfMinCosignatoriesStructure = 4;
 
     public ByteArrayTransactionEncoder(ByteSerializer byteSerializer, HexConverter hexEncoder) {
         this.byteSerializer = byteSerializer;
@@ -20,8 +21,9 @@ public class ByteArrayTransactionEncoder implements TransactionEncoder {
 
     @Override
     public byte[] data(Transaction transaction) {
-        byte[] message = byteSerializer.messageToByte(transaction.message);
-        byte[] mosaics = getAllMosaicsBytes(transaction);
+        byte[] transferPart = getTransferPartData(transaction);
+        byte[] mosaicsPart = getAllMosaicsBytes(transaction);
+        byte[] multisigAccountCreationPart = getAggregateModificationPart(transaction);
         return
                 concat(
                         byteSerializer.intToByte(transaction.type),
@@ -31,13 +33,36 @@ public class ByteArrayTransactionEncoder implements TransactionEncoder {
                         hexConverter.getBytes(transaction.signer),
                         byteSerializer.longToByte(transaction.fee),
                         byteSerializer.intToByte(transaction.deadline),
-                        byteSerializer.intToByte(numberOfBytesInRecipient),
-                        byteSerializer.addressToByte(transaction.recipient),
-                        byteSerializer.longToByte(transaction.amount),
-                        byteSerializer.intToByte(message.length),
-                        message,
-                        mosaics
+                        transferPart,
+                        mosaicsPart,
+                        multisigAccountCreationPart
                 );
+    }
+
+    private byte[] getAggregateModificationPart(Transaction transaction) {
+        if (isEmpty(transaction.modifications)) {
+            return new byte[0];
+        }
+
+        byte[] modificationsData = transaction.modifications.stream()
+                .map(byteSerializer::modificationToByte)
+                .reduce(byteSerializer.intToByte(transaction.modifications.size()), (b1, b2) -> concat(b1, b2));
+
+        return concat(
+                modificationsData,
+                byteSerializer.intToByte(lengthOfMinCosignatoriesStructure),
+                byteSerializer.intToByte(transaction.minCosignatories.relativeChange)
+        );
+    }
+
+    private byte[] getTransferPartData(Transaction transaction) {
+        byte[] messagePart = byteSerializer.messageToByte(transaction.message);
+        return transaction.recipient == null ? new byte[0] : concat(
+                byteSerializer.intToByte(numberOfBytesInRecipient),
+                byteSerializer.addressToByte(transaction.recipient),
+                byteSerializer.longToByte(transaction.amount),
+                byteSerializer.intToByte(messagePart.length),
+                messagePart);
     }
 
     private byte[] getAllMosaicsBytes(Transaction transaction) {

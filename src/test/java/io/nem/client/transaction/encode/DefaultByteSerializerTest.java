@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 class DefaultByteSerializerTest {
 
-    private final ByteSerializer byteSerializer = new DefaultByteSerializer();
+    private final ByteSerializer byteSerializer = new DefaultByteSerializer(new DefaultHexConverter());
 
     @Test
     void serializeInt() {
