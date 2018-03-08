@@ -16,6 +16,8 @@ import io.nem.client.transaction.version.VersionProvider;
 
 import java.util.List;
 
+import static io.nem.client.common.multisig.ModificationType.ADD_COSIGNATORY;
+import static io.nem.client.common.multisig.ModificationType.REMOVE_COSIGNATORY;
 import static io.nem.client.transaction.TransactionType.*;
 import static java.math.BigInteger.TEN;
 import static java.util.stream.Collectors.toList;
@@ -53,21 +55,21 @@ public class SecureTransactionClient implements TransactionClient {
 
         int currentTime = nodeClient.extendedInfo().nisInfo.currentTime;
 
-        Transaction transaction = transferNemTransaction(toAddress, microXemAmount, message, timeToLiveInSeconds, publicKey, currentTime);
+        Transaction transaction = transferNemTransaction(publicKey, toAddress, microXemAmount, message, currentTime, timeToLiveInSeconds);
 
         byte[] data = transactionEncoder.data(transaction);
         return feignTransactionClient.prepare(new RequestAnnounce(hexConverter.getString(data), signer.sign(data)));
     }
 
     @Override
-    public NemAnnounceResult transferMosaics(String privateKey, String toAddress, String message, int timeToLiveInSeconds, List<MosaicTransfer> mosaics, int times) {
+    public NemAnnounceResult transferMosaics(String privateKey, String toAddress, List<MosaicTransfer> mosaics, int times, String message, int timeToLiveInSeconds) {
 
         Signer signer = new DefaultSigner(privateKey);
         String publicKey = signer.publicKey();
 
         int currentTime = nodeClient.extendedInfo().nisInfo.currentTime;
 
-        Transaction transaction = mosaicsTransferTransaction(toAddress, message, timeToLiveInSeconds, mosaics, times, publicKey, currentTime);
+        Transaction transaction = mosaicsTransferTransaction(publicKey, toAddress, mosaics, times, message, currentTime, timeToLiveInSeconds);
 
         byte[] data = transactionEncoder.data(transaction);
 
@@ -75,22 +77,15 @@ public class SecureTransactionClient implements TransactionClient {
     }
 
     @Override
-    public NemAnnounceResult createMultisigAccount(String privateKey, int timeToLiveInSeconds, List<String> cosignatories, int minCosignatories) {
+    public NemAnnounceResult createMultisigAccount(String privateKey, List<String> cosignatories, int minCosignatories, int timeToLiveInSeconds) {
 
         Signer signer = new DefaultSigner(privateKey);
 
         int currentTime = nodeClient.extendedInfo().nisInfo.currentTime;
 
-        Transaction transaction = Transaction.builder()
-                .type(MULTISIG_AGGREGATE_MODIFICATION.type)
-                .version(versionProvider.version(network, MULTISIG_AGGREGATE_MODIFICATION))
-                .timeStamp(currentTime)
-                .signer(signer.publicKey())
-                .fee(feeCalculator.multisigAccountCreationFee())
-                .deadline(currentTime + timeToLiveInSeconds)
-                .modifications(cosignatories.stream().map(publicKey -> new Modification(1, publicKey)).collect(toList()))
-                .minCosignatories(new RelativeChange(minCosignatories))
-                .build();
+        List<Modification> modifications = cosignatories.stream().map(publicKey -> new Modification(1, publicKey)).collect(toList());
+
+        Transaction transaction = aggregateModificationTransaction(signer.publicKey(), modifications, minCosignatories, currentTime, timeToLiveInSeconds);
 
         byte[] data = transactionEncoder.data(transaction);
 
@@ -98,11 +93,27 @@ public class SecureTransactionClient implements TransactionClient {
     }
 
     @Override
-    public NemAnnounceResult multisigTransferNem(String privateKey, String multisigPublicKey, String toAddress, long microXemAmount, String message, int timeToLiveInSeconds) {
+    public NemAnnounceResult addCosignatoriesToMultisigAccount(String privateKey, List<String> cosignatories, int relativeChange, String multisigPublicKey, int timeToLiveInSeconds) {
+        Signer signer = new DefaultSigner(privateKey);
+        int currentTime = nodeClient.extendedInfo().nisInfo.currentTime;
+        List<Modification> modifications = cosignatories.stream().map(cosignatory -> new Modification(ADD_COSIGNATORY.type, cosignatory)).collect(toList());
+        return modifyMultisigAccountTransaction(signer, modifications, relativeChange, multisigPublicKey, currentTime, timeToLiveInSeconds);
+    }
+
+    @Override
+    public NemAnnounceResult removeCosignatoriesFromMultisigAccount(String privateKey, List<String> cosignatories, int relativeChange, String multisigPublicKey, int timeToLiveInSeconds) {
+        Signer signer = new DefaultSigner(privateKey);
+        int currentTime = nodeClient.extendedInfo().nisInfo.currentTime;
+        List<Modification> modifications = cosignatories.stream().map(cosignatory -> new Modification(REMOVE_COSIGNATORY.type, cosignatory)).collect(toList());
+        return modifyMultisigAccountTransaction(signer, modifications, relativeChange, multisigPublicKey, currentTime, timeToLiveInSeconds);
+    }
+
+    @Override
+    public NemAnnounceResult multisigTransferNem(String privateKey, String toAddress, long microXemAmount, String message, String multisigPublicKey, int timeToLiveInSeconds) {
         Signer signer = new DefaultSigner(privateKey);
         int currentTime = nodeClient.extendedInfo().nisInfo.currentTime;
 
-        Transaction transferTransaction = transferNemTransaction(toAddress, microXemAmount, message, timeToLiveInSeconds, multisigPublicKey, currentTime);
+        Transaction transferTransaction = transferNemTransaction(multisigPublicKey, toAddress, microXemAmount, message, currentTime, timeToLiveInSeconds);
         Transaction transaction = Transaction.builder()
                 .type(MULTISIG_TRANSACTION.type)
                 .version(versionProvider.version(network, MULTISIG_TRANSACTION))
@@ -119,12 +130,12 @@ public class SecureTransactionClient implements TransactionClient {
     }
 
     @Override
-    public NemAnnounceResult multisigTransferMosaics(String privateKey, String multisigPublicKey, String toAddress, String message, int timeToLiveInSeconds, List<MosaicTransfer> mosaics, int times) {
+    public NemAnnounceResult multisigTransferMosaics(String privateKey, String toAddress, List<MosaicTransfer> mosaics, int times, String message, String multisigPublicKey, int timeToLiveInSeconds) {
 
         Signer signer = new DefaultSigner(privateKey);
         int currentTime = nodeClient.extendedInfo().nisInfo.currentTime;
 
-        Transaction transferTransaction = mosaicsTransferTransaction(toAddress, message, timeToLiveInSeconds, mosaics, times, multisigPublicKey, currentTime);
+        Transaction transferTransaction = mosaicsTransferTransaction(multisigPublicKey, toAddress, mosaics, times, message, currentTime, timeToLiveInSeconds);
         Transaction transaction = Transaction.builder()
                 .type(MULTISIG_TRANSACTION.type)
                 .version(versionProvider.version(network, MULTISIG_TRANSACTION))
@@ -184,7 +195,7 @@ public class SecureTransactionClient implements TransactionClient {
         return feignTransactionClient.prepare(new RequestAnnounce(hexConverter.getString(data), signer.sign(data)));
     }
 
-    private Transaction transferNemTransaction(String toAddress, long microXemAmount, String message, int timeToLiveInSeconds, String publicKey, int currentTime) {
+    private Transaction transferNemTransaction(String publicKey, String toAddress, long microXemAmount, String message, int currentTime, int timeToLiveInSeconds) {
         return Transaction.builder()
                 .type(TRANSFER_NEM.type)
                 .version(versionProvider.version(network, TRANSFER_NEM))
@@ -198,7 +209,7 @@ public class SecureTransactionClient implements TransactionClient {
                 .build();
     }
 
-    private Transaction mosaicsTransferTransaction(String toAddress, String message, int timeToLiveInSeconds, List<MosaicTransfer> mosaics, int times, String publicKey, int currentTime) {
+    private Transaction mosaicsTransferTransaction(String publicKey, String toAddress, List<MosaicTransfer> mosaics, int times, String message, int currentTime, int timeToLiveInSeconds) {
         return Transaction.builder()
                 .type(TRANSFER_MOSAICS.type)
                 .version(versionProvider.version(network, TRANSFER_MOSAICS))
@@ -211,5 +222,36 @@ public class SecureTransactionClient implements TransactionClient {
                 .message(new Message(message, 1))
                 .mosaics(mosaics)
                 .build();
+    }
+
+    private Transaction aggregateModificationTransaction(String publicKey, List<Modification> modifications, int minCosignatoriesRelativeChange, int currentTime, int timeToLiveInSeconds) {
+        return Transaction.builder()
+                .type(MULTISIG_AGGREGATE_MODIFICATION.type)
+                .version(versionProvider.version(network, MULTISIG_AGGREGATE_MODIFICATION))
+                .timeStamp(currentTime)
+                .signer(publicKey)
+                .fee(feeCalculator.multisigAccountCreationFee())
+                .deadline(currentTime + timeToLiveInSeconds)
+                .modifications(modifications)
+                .minCosignatories(new RelativeChange(minCosignatoriesRelativeChange))
+                .build();
+    }
+
+    private NemAnnounceResult modifyMultisigAccountTransaction(Signer signer, List<Modification> modifications, int relativeChange, String multisigPublicKey, int currentTime, int timeToLiveInSeconds) {
+        Transaction modificationTransaction = aggregateModificationTransaction(multisigPublicKey, modifications, relativeChange, currentTime, timeToLiveInSeconds);
+
+        Transaction transaction = Transaction.builder()
+                .type(MULTISIG_TRANSACTION.type)
+                .version(versionProvider.version(network, MULTISIG_TRANSACTION))
+                .timeStamp(currentTime)
+                .signer(signer.publicKey())
+                .fee(feeCalculator.multisigTransactionFee())
+                .deadline(currentTime + timeToLiveInSeconds)
+                .otherTrans(modificationTransaction)
+                .build();
+
+        byte[] data = transactionEncoder.data(transaction);
+
+        return feignTransactionClient.prepare(new RequestAnnounce(hexConverter.getString(data), signer.sign(data)));
     }
 }
