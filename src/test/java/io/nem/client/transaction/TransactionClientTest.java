@@ -1,13 +1,14 @@
 package io.nem.client.transaction;
 
 import io.nem.client.DefaultNemClientFactory;
-import io.nem.client.common.MosaicId;
-import io.nem.client.common.MosaicTransfer;
+import io.nem.client.common.transaction.mosaic.MosaicId;
+import io.nem.client.common.transaction.mosaic.MosaicTransfer;
 import io.nem.client.transaction.response.NemAnnounceResult;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static io.nem.client.common.transaction.importance.Action.ACTIVATE;
 import static io.nem.client.transaction.version.Network.TEST;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -144,5 +145,17 @@ class TransactionClientTest {
                 3600
         );
         assertEquals(1, cosigningResult.code);
+    }
+
+    @Test
+    @Disabled
+    void importanceTransfer() {
+        NemAnnounceResult nemAnnounceResult = transactionClient.importanceTransfer(
+                "fcf0dadc958510dca65651df81aa22c82b2bfe5b29bf8dfb92816bc5f1f11a54",
+                ACTIVATE,
+                "82bfa081e42631c0edc1f16b7a5b0534a5b2e4b88cbce709c623a70192e93b7a",
+                3600
+        );
+        assertEquals(1, nemAnnounceResult.code);
     }
 }

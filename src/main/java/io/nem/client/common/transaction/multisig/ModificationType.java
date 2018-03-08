@@ -1,4 +1,4 @@
-package io.nem.client.common.multisig;
+package io.nem.client.common.transaction.multisig;
 
 public enum ModificationType {
     ADD_COSIGNATORY(1), REMOVE_COSIGNATORY(2);

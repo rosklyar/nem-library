@@ -1,10 +1,13 @@
-package io.nem.client.common;
+package io.nem.client.common.transaction;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import io.nem.client.account.response.Signature;
-import io.nem.client.common.multisig.Modification;
-import io.nem.client.common.multisig.RelativeChange;
+import io.nem.client.common.Hash;
+import io.nem.client.common.Message;
+import io.nem.client.common.transaction.mosaic.MosaicTransfer;
+import io.nem.client.common.transaction.multisig.Modification;
+import io.nem.client.common.transaction.multisig.RelativeChange;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

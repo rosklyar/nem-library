@@ -3,7 +3,7 @@ package io.nem.client.blockchain.response.block;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import io.nem.client.common.Hash;
-import io.nem.client.common.Transaction;
+import io.nem.client.common.transaction.Transaction;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

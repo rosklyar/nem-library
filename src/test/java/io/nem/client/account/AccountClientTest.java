@@ -9,7 +9,7 @@ import io.nem.client.account.response.harvest.HarvestInfo;
 import io.nem.client.account.response.history.HistoryResponse;
 import io.nem.client.account.response.importance.ImportanceResponse;
 import io.nem.client.common.KeyPair;
-import io.nem.client.common.MosaicId;
+import io.nem.client.common.transaction.mosaic.MosaicId;
 import io.nem.client.account.response.mosaic.MosaicsResponse;
 import io.nem.client.account.response.mosaic.OwnedMosaic;
 import io.nem.client.account.response.mosaic.OwnedMosaicsResponse;

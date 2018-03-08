@@ -2,7 +2,7 @@ package io.nem.client.transaction.fee;
 
 import io.nem.client.account.AccountClient;
 import io.nem.client.account.response.mosaic.OwnedMosaicsResponse;
-import io.nem.client.common.MosaicTransfer;
+import io.nem.client.common.transaction.mosaic.MosaicTransfer;
 import io.nem.client.mosaic.MosaicClient;
 import io.nem.client.mosaic.response.MosaicMetaData;
 import io.nem.client.mosaic.response.MosaicsMetaDataResponse;
@@ -69,6 +69,11 @@ public class DefaultFeeCalculator implements FeeCalculator {
     public long rentalFee(String parent, String namespace) {
         long microXemsInXem = TEN.pow(nemDivisibility).longValue();
         return isNullOrEmpty(parent) ? 100L * microXemsInXem : 10 * microXemsInXem;
+    }
+
+    @Override
+    public long importanceTransferFee() {
+        return 3L * feeUnit;
     }
 
     private long mosaicFee(MosaicTransfer mosaicTransfer, int times) {

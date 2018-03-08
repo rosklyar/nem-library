@@ -1,6 +1,6 @@
 package io.nem.client.transaction.fee;
 
-import io.nem.client.common.MosaicTransfer;
+import io.nem.client.common.transaction.mosaic.MosaicTransfer;
 
 import java.util.List;
 
@@ -18,4 +18,6 @@ public interface FeeCalculator {
     long namespaceProvisionFee();
 
     long rentalFee(String parent, String namespace);
+
+    long importanceTransferFee();
 }

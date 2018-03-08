@@ -1,7 +1,5 @@
-package io.nem.client.common;
+package io.nem.client.common.transaction;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -9,7 +7,6 @@ import lombok.ToString;
 @EqualsAndHashCode
 @ToString
 @Builder
-@JsonDeserialize(builder = ProvisionNamespaceTransaction.ProvisionNamespaceTransactionBuilder.class)
 public class ProvisionNamespaceTransaction {
 
     public final int timeStamp;
@@ -23,8 +20,4 @@ public class ProvisionNamespaceTransaction {
     public final String newPart;
     public final String parent;
 
-    @JsonPOJOBuilder(withPrefix = "")
-    public static class ProvisionNamespaceTransactionBuilder {
-
-    }
 }

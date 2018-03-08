@@ -1,8 +1,14 @@
 package io.nem.client.transaction;
 
-import io.nem.client.common.*;
-import io.nem.client.common.multisig.Modification;
-import io.nem.client.common.multisig.RelativeChange;
+import io.nem.client.common.Hash;
+import io.nem.client.common.Message;
+import io.nem.client.common.transaction.ProvisionNamespaceTransaction;
+import io.nem.client.common.transaction.Transaction;
+import io.nem.client.common.transaction.importance.Action;
+import io.nem.client.common.transaction.importance.ImportanceTransferTransaction;
+import io.nem.client.common.transaction.mosaic.MosaicTransfer;
+import io.nem.client.common.transaction.multisig.Modification;
+import io.nem.client.common.transaction.multisig.RelativeChange;
 import io.nem.client.node.NodeClient;
 import io.nem.client.transaction.encode.DefaultSigner;
 import io.nem.client.transaction.encode.HexConverter;
@@ -16,8 +22,8 @@ import io.nem.client.transaction.version.VersionProvider;
 
 import java.util.List;
 
-import static io.nem.client.common.multisig.ModificationType.ADD_COSIGNATORY;
-import static io.nem.client.common.multisig.ModificationType.REMOVE_COSIGNATORY;
+import static io.nem.client.common.transaction.multisig.ModificationType.ADD_COSIGNATORY;
+import static io.nem.client.common.transaction.multisig.ModificationType.REMOVE_COSIGNATORY;
 import static io.nem.client.transaction.TransactionType.*;
 import static java.math.BigInteger.TEN;
 import static java.util.stream.Collectors.toList;
@@ -188,6 +194,27 @@ public class SecureTransactionClient implements TransactionClient {
                 .rentalFee(feeCalculator.rentalFee(parentNamespace, namespace))
                 .parent(parentNamespace)
                 .newPart(namespace)
+                .build();
+
+        byte[] data = transactionEncoder.data(transaction);
+
+        return feignTransactionClient.prepare(new RequestAnnounce(hexConverter.getString(data), signer.sign(data)));
+    }
+
+    @Override
+    public NemAnnounceResult importanceTransfer(String privateKey, Action action, String remoteAccountPublicKey, int timeToLiveInSeconds) {
+        Signer signer = new DefaultSigner(privateKey);
+        int currentTime = nodeClient.extendedInfo().nisInfo.currentTime;
+
+        ImportanceTransferTransaction transaction = ImportanceTransferTransaction.builder()
+                .type(IMPORTANCE_TRANSFER_TRANSACTION.type)
+                .version(versionProvider.version(network, IMPORTANCE_TRANSFER_TRANSACTION))
+                .timeStamp(currentTime)
+                .signer(signer.publicKey())
+                .fee(feeCalculator.importanceTransferFee())
+                .deadline(currentTime + timeToLiveInSeconds)
+                .action(action)
+                .remoteAccount(remoteAccountPublicKey)
                 .build();
 
         byte[] data = transactionEncoder.data(transaction);

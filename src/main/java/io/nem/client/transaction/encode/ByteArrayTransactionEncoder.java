@@ -1,7 +1,8 @@
 package io.nem.client.transaction.encode;
 
-import io.nem.client.common.ProvisionNamespaceTransaction;
-import io.nem.client.common.Transaction;
+import io.nem.client.common.transaction.ProvisionNamespaceTransaction;
+import io.nem.client.common.transaction.Transaction;
+import io.nem.client.common.transaction.importance.ImportanceTransferTransaction;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.primitives.Bytes.concat;
@@ -59,6 +60,22 @@ public class ByteArrayTransactionEncoder implements TransactionEncoder {
                 byteSerializer.intToByte(transaction.newPart.length()),
                 byteSerializer.stringToBytes(transaction.newPart),
                 parentNamespacePart
+        );
+    }
+
+    @Override
+    public byte[] data(ImportanceTransferTransaction transaction) {
+        return concat(
+                byteSerializer.intToByte(transaction.type),
+                byteSerializer.intToByte(transaction.version),
+                byteSerializer.intToByte(transaction.timeStamp),
+                byteSerializer.intToByte(numberOfBytesInPublicKey),
+                hexConverter.getBytes(transaction.signer),
+                byteSerializer.longToByte(transaction.fee),
+                byteSerializer.intToByte(transaction.deadline),
+                byteSerializer.intToByte(transaction.action.mode),
+                byteSerializer.intToByte(numberOfBytesInPublicKey),
+                hexConverter.getBytes(transaction.remoteAccount)
         );
     }
 

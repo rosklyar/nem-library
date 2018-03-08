@@ -1,6 +1,7 @@
 package io.nem.client.transaction;
 
-import io.nem.client.common.MosaicTransfer;
+import io.nem.client.common.transaction.importance.Action;
+import io.nem.client.common.transaction.mosaic.MosaicTransfer;
 import io.nem.client.transaction.response.NemAnnounceResult;
 
 import java.util.List;
@@ -24,5 +25,7 @@ public interface TransactionClient {
     NemAnnounceResult cosignTransaction(String privateKey, String transactionHash, String multisigAddress, int timeToLiveInSeconds);
 
     NemAnnounceResult createNamespace(String privateKey, String parentNamespace, String namespace, int timeToLiveInSeconds);
+
+    NemAnnounceResult importanceTransfer(String privateKey, Action action, String remoteAccountPublicKey, int timeToLiveInSeconds);
 
 }
