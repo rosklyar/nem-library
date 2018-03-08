@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 class AccountClientTest {
 
-    private final AccountClient accountClient = new DefaultNemClientFactory().createAccountClient("http://127.0.0.1:7890");
+    private final AccountClient accountClient = new DefaultNemClientFactory().createAccountClient("http://153.122.112.137:7890");
 
     private final String address = "TAVNDWBJFJHZYD3YYWJPDQ345ZAZIYEB2LJXSG65";
     private final String cosignatoryAddress = "TBNDMABIECCN6EQY5WVNJZMCXAUVTN7RKGZH4CP4";
