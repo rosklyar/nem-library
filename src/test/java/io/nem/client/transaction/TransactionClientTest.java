@@ -4,18 +4,29 @@ import io.nem.client.DefaultNemClientFactory;
 import io.nem.client.common.transaction.mosaic.MosaicId;
 import io.nem.client.common.transaction.mosaic.MosaicTransfer;
 import io.nem.client.transaction.response.NemAnnounceResult;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.netflix.config.ConfigurationManager.getConfigInstance;
 import static io.nem.client.common.transaction.importance.Action.ACTIVATE;
-import static io.nem.client.transaction.version.Network.TEST;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class TransactionClientTest {
 
-    private final TransactionClient transactionClient = new DefaultNemClientFactory().createTransactionClient("http://153.122.112.137:7890", TEST);
+    private final TransactionClient transactionClient = new DefaultNemClientFactory().createTransactionClient();
+
+    @BeforeAll
+    static void init() {
+        getConfigInstance().setProperty("transactionApi.ribbon.listOfServers", "153.122.112.137:7890");
+        getConfigInstance().setProperty("accountApi.ribbon.listOfServers", "153.122.112.137:7890");
+        getConfigInstance().setProperty("mosaicApi.ribbon.listOfServers", "153.122.112.137:7890");
+        getConfigInstance().setProperty("nodeApi.ribbon.listOfServers", "153.122.112.137:7890");
+        getConfigInstance().setProperty("transaction.client.network", "TEST");
+        getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", 20000);
+    }
 
     @Test
     @Disabled

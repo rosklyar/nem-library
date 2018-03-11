@@ -4,14 +4,22 @@ import io.nem.client.DefaultNemClientFactory;
 import io.nem.client.mosaic.response.MosaicsMetaDataResponse;
 import io.nem.client.mosaic.response.Namespace;
 import io.nem.client.mosaic.response.NamespacesMetaDataResponse;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import static com.netflix.config.ConfigurationManager.getConfigInstance;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MosaicClientTest {
 
-    private final MosaicClient mosaicClient = new DefaultNemClientFactory().createMosaicClient("http://153.122.112.137:7890");
+    private final MosaicClient mosaicClient = new DefaultNemClientFactory().createMosaicClient();
+
+    @BeforeAll
+    static void init() {
+        getConfigInstance().setProperty("mosaicApi.ribbon.listOfServers", "153.122.112.137:7890");
+        getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", 20000);
+    }
 
     @Test
     void getNamespaces() {

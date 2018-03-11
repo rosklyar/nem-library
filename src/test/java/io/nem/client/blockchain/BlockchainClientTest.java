@@ -1,19 +1,27 @@
 package io.nem.client.blockchain;
 
 import io.nem.client.DefaultNemClientFactory;
-import io.nem.client.blockchain.response.block.BlockHeight;
 import io.nem.client.blockchain.response.HeightResponse;
 import io.nem.client.blockchain.response.ScoreResponse;
 import io.nem.client.blockchain.response.block.Block;
+import io.nem.client.blockchain.response.block.BlockHeight;
 import io.nem.client.blockchain.response.block.BlocksAfterResponse;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import static com.netflix.config.ConfigurationManager.getConfigInstance;
 import static org.junit.jupiter.api.Assertions.*;
 
 class BlockchainClientTest {
 
-    private final BlockchainClient blockchainClient = new DefaultNemClientFactory().createBlockchainClient("http://153.122.112.137:7890");
+    private final BlockchainClient blockchainClient = new DefaultNemClientFactory().createBlockchainClient();
+
+    @BeforeAll
+    static void init() {
+        getConfigInstance().setProperty("blockchainApi.ribbon.listOfServers", "153.122.112.137:7890");
+        getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", 20000);
+    }
 
     @Test
     void getChainHeight() {

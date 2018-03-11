@@ -6,22 +6,30 @@ import io.nem.client.node.request.ApplicationMetaData;
 import io.nem.client.node.request.BootNodeRequest;
 import io.nem.client.node.request.PrivateIdentity;
 import io.nem.client.node.response.*;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import static com.netflix.config.ConfigurationManager.getConfigInstance;
 import static org.junit.jupiter.api.Assertions.*;
 
 class NodeClientTest {
 
-    private final String ip = "153.122.112.137";
-    private final NodeClient nodeClient = new DefaultNemClientFactory().createNodeClient("http://" + ip + ":7890");
+    private static String IP = "153.122.112.137";
+    private final NodeClient nodeClient = new DefaultNemClientFactory().createNodeClient();
 
     private final String privateKey = "0476fd96242ac5ef6cb1b268887254c1a3089759556beb1ce660c0cb2c42bb27";
+
+    @BeforeAll
+    static void init() {
+        getConfigInstance().setProperty("nodeApi.ribbon.listOfServers", IP + ":7890");
+        getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", 20000);
+    }
 
     @Test
     void getNodeInfo() {
         Node info = nodeClient.info();
-        assertEquals(ip, info.endpoint.host);
+        assertEquals(IP, info.endpoint.host);
 
         ExtendedNodeInfo extendedNodeInfo = nodeClient.extendedInfo();
         assertEquals(info, extendedNodeInfo.node);
