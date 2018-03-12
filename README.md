@@ -1,4 +1,4 @@
-# lightweight java library to integrate with NEM blockchain
+# Lightweight java library to integrate with NEM blockchain
 
 Uses:
 - feign(https://github.com/OpenFeign/feign) to make http calls to NIS(based on docs from https://bob.nem.ninja/docs/)
@@ -45,6 +45,7 @@ You can also use separate file(or any other configuration source archaius suppor
 -Darchaius.configurationSource.additionalUrls=file:///apps/myapp/nem-library.properties
 ```
 Example of properties file needed for MAIN network see at src/test/resources/nem-library.properties
+You also can configure hystrix(circuit breaker) and ribbon(load balancing) with archaius configuration. For details see projects documentation pages(https://github.com/Netflix/Hystrix/wiki/Configuration, https://github.com/Netflix/ribbon/wiki/Programmers-Guide).
 
 <h3>3. Create client instance using DefaultNemClientFactory</h3>
 
