@@ -1,10 +1,10 @@
 package io.nem.client.transaction.encode;
 
-import org.nem.core.crypto.DsaSigner;
-import org.nem.core.crypto.KeyPair;
+import io.nem.crypto.DsaSigner;
+import io.nem.crypto.KeyPair;
+import io.nem.crypto.ed25519.Ed25519CryptoEngine;
 
-import static org.nem.core.crypto.CryptoEngines.defaultEngine;
-import static org.nem.core.crypto.PrivateKey.fromHexString;
+import static io.nem.crypto.PrivateKey.fromHexString;
 
 public class DefaultSigner implements Signer {
 
@@ -13,7 +13,7 @@ public class DefaultSigner implements Signer {
 
     public DefaultSigner(String hexString) {
         cryptoKeyPair = new KeyPair(fromHexString(hexString));
-        dsaSigner = defaultEngine().createDsaSigner(cryptoKeyPair);
+        dsaSigner = Ed25519CryptoEngine.createDsaSigner(cryptoKeyPair);
     }
 
     @Override
