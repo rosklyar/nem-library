@@ -44,7 +44,7 @@ You can also use separate file(or any other configuration source archaius suppor
 ```bash
 -Darchaius.configurationSource.additionalUrls=file:///apps/myapp/nem-library.properties
 ```
-Example of properties file needed for MAIN network see at src/test/resources/nem-library.properties <br>
+Example of properties file needed for MAIN network see at src/test/resources/nem-library.properties.<br>
 You also can configure hystrix(circuit breaker) and ribbon(load balancing) with archaius configuration. For details see projects documentation pages:<br>
 - https://github.com/Netflix/Hystrix/wiki/Configuration
 - https://github.com/Netflix/ribbon/wiki/Programmers-Guide
