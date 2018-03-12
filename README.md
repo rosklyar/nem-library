@@ -39,7 +39,8 @@ ConfigurationManager.getConfigInstance().setProperty("blockchainApi.ribbon.listO
 ConfigurationManager.getConfigInstance().setProperty("transaction.client.network", "TEST");
 ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", 20000);
 ```
-You can also use separate file(or any other configuration source archaius supports - https://github.com/Netflix/archaius/wiki) to setup configuration adding this to your application start up script:
+You can also use separate file(or any other configuration source archaius supports - https://github.com/Netflix/archaius/wiki) to setup configuration. </br>
+Add this to your application start up script:
 
 ```bash
 -Darchaius.configurationSource.additionalUrls=file:///apps/myapp/nem-library.properties
