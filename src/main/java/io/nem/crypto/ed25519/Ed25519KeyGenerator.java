@@ -1,26 +1,41 @@
 package io.nem.crypto.ed25519;
 
 import io.nem.crypto.KeyGenerator;
+import io.nem.crypto.KeyPair;
 import io.nem.crypto.PrivateKey;
 import io.nem.crypto.PublicKey;
 import io.nem.crypto.ed25519.arithmetic.Ed25519EncodedFieldElement;
-import io.nem.crypto.ed25519.arithmetic.Ed25519Group;
 import io.nem.crypto.ed25519.arithmetic.Ed25519GroupElement;
+import io.nem.utils.ArrayUtils;
 
-/**
- * Implementation of the key generator for Ed25519.
- */
+import java.security.SecureRandom;
+
+import static io.nem.crypto.ed25519.Ed25519Utils.prepareForScalarMultiply;
+import static io.nem.crypto.ed25519.arithmetic.Ed25519Group.BASE_POINT;
+
 public class Ed25519KeyGenerator implements KeyGenerator {
+    private final SecureRandom random;
+
+    public Ed25519KeyGenerator() {
+        this.random = new SecureRandom();
+    }
+
+    @Override
+    public KeyPair generateKeyPair() {
+        final byte[] seed = new byte[32];
+        this.random.nextBytes(seed);
+
+        PrivateKey privateKey = new PrivateKey(ArrayUtils.toBigInteger(seed));
+
+        return new KeyPair(privateKey);
+    }
 
     @Override
     public PublicKey derivePublicKey(final PrivateKey privateKey) {
-        final Ed25519EncodedFieldElement a = Ed25519Utils.prepareForScalarMultiply(privateKey);
+        final Ed25519EncodedFieldElement a = prepareForScalarMultiply(privateKey);
 
-        // a * base point is the public key.
-        final Ed25519GroupElement pubKey = Ed25519Group.BASE_POINT.scalarMultiply(a);
+        final Ed25519GroupElement pubKey = BASE_POINT.scalarMultiply(a);
 
-        // verification of signatures will be about twice as fast when pre-calculating
-        // a suitable table of group elements.
         return new PublicKey(pubKey.encode().getRaw());
     }
 }

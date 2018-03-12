@@ -7,7 +7,6 @@ import io.nem.client.account.request.AccountPrivateKeyTransactionsPage;
 import io.nem.client.account.request.PrivateKey;
 import io.nem.client.account.response.AccountMetaData;
 import io.nem.client.account.response.AccountMetaDataPair;
-import io.nem.client.common.KeyPair;
 import io.nem.client.account.response.UnlockedInfo;
 import io.nem.client.account.response.harvest.HarvestsResponse;
 import io.nem.client.account.response.history.HistoryResponse;
@@ -17,13 +16,22 @@ import io.nem.client.account.response.mosaic.OwnedMosaicsResponse;
 import io.nem.client.account.response.namespace.NamespacesResponse;
 import io.nem.client.account.response.transaction.Transactions;
 import io.nem.client.account.response.transaction.UnconfirmedTransactions;
+import io.nem.client.common.KeyPair;
 
 @Headers({"Accept: application/json"})
 public interface FeignAccountClient extends AccountClient {
 
     @Override
-    @RequestLine("GET /account/generate")
-    KeyPair generate();
+    default KeyPair generate() {
+        io.nem.crypto.KeyPair generated = io.nem.crypto.KeyPair.random();
+        String publicKey = generated.getPublicKey().toString();
+        return KeyPair
+                .builder()
+                .privateKey(generated.getPrivateKey().toString())
+                .publicKey(publicKey)
+                .address(getFromPublicKey(publicKey).account.address)
+                .build();
+    }
 
     @Override
     @RequestLine("GET /account/get?address={address}")
@@ -31,7 +39,7 @@ public interface FeignAccountClient extends AccountClient {
 
     @Override
     @RequestLine("GET /account/get/from-public-key?publicKey={publicKey}")
-    AccountMetaDataPair getFromPublicKey(@Param("publicKey") String address);
+    AccountMetaDataPair getFromPublicKey(@Param("publicKey") String publicKey);
 
     @Override
     @RequestLine("GET /account/get/forwarded?address={address}")

@@ -23,6 +23,11 @@ public class KeyPair {
         }
     }
 
+    public static KeyPair random() {
+        KeyPair pair = createKeyGenerator().generateKeyPair();
+        return new KeyPair(pair.getPrivateKey(), pair.getPublicKey());
+    }
+
     public PrivateKey getPrivateKey() {
         return this.privateKey;
     }

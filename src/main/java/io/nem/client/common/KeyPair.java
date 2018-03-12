@@ -17,7 +17,7 @@ public class KeyPair {
     public final String publicKey;
 
     @JsonPOJOBuilder(withPrefix = "")
-    static class KeyPairBuilder {
+    public static class KeyPairBuilder {
 
     }
 }
