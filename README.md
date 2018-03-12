@@ -1,8 +1,12 @@
 # lightweight java library to integrate with NEM blockchain
 
-Uses feign(https://github.com/OpenFeign/feign) to make http calls to NIS(based on docs from https://bob.nem.ninja/docs/)
+Uses:
+- feign(https://github.com/OpenFeign/feign) to make http calls to NIS(based on docs from https://bob.nem.ninja/docs/)
+- hystrix(https://github.com/Netflix/Hystrix) to implement circuit breaker
+- ribbon(https://github.com/Netflix/ribbon) to implement load balancing
+- archaius(https://github.com/Netflix/archaius) to configure library
 
-<h2>Build</h2>
+<h2>Install</h2>
 Just install library to local maven storage
 
 ```bash
@@ -10,6 +14,49 @@ git clone https://github.com/rosklyar/nem-library.git
 cd nem-library
 mvn clean install
 ```
+
+<h2>Usage</h2>
+Import library as maven dependency
+
+```xml
+<dependency>
+    <groupId>io.nem</groupId>
+    <artifactId>nem-library</artifactId>
+    <version>1.0-SNAPSHOT</version>
+</dependency>
+```
+
+1. Configure library using archaius. </br>
+I used static config instance in tests to setup configuration:
+
+```java
+getConfigInstance().setProperty("transactionApi.ribbon.listOfServers", "153.122.112.137:7890");
+getConfigInstance().setProperty("accountApi.ribbon.listOfServers", "153.122.112.137:7890");
+getConfigInstance().setProperty("mosaicApi.ribbon.listOfServers", "153.122.112.137:7890");
+getConfigInstance().setProperty("nodeApi.ribbon.listOfServers", "153.122.112.137:7890");
+getConfigInstance().setProperty("transaction.client.network", "TEST");
+getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", 20000);
+```
+You can also use separate file(or any other configuration source archaius supports - https://github.com/Netflix/archaius/wiki) to setup configuration adding this to your application start up script:
+
+```bash
+-Darchaius.configurationSource.additionalUrls=file:///apps/myapp/nem-library.properties
+```
+Example of properties file needed for MAIN network see at src/test/resources/nem-library.properties
+
+2. Create client instance using DefaultNemClientFactory:
+
+```java
+AccountClient accountClient = new DefaultNemClientFactory().createAccountClient();
+BlockchainClient blockchainClient = new DefaultNemClientFactory().createBlockchainClient();
+MosaicClient mosaicClient = new DefaultNemClientFactory().createMosaicClient();
+NodeClient nodeClient = new DefaultNemClientFactory().createNodeClient();
+StatusClient statusClient = new DefaultNemClientFactory().createStatusClient();
+TransactionClient transactionClient = new DefaultNemClientFactory().createTransactionClient();
+```
+
+3. Example of usage you can see in tests package src/test/java/io/nem/client
+
 
 You can support project if you want <br/>
 XEM: NALNZB-Q4JJP2-PYAS6I-4KWTLT-367SJJ-RKXX6I-WUQR <br/>
