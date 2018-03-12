@@ -3,7 +3,6 @@ package io.nem.client.transaction.version;
 import org.junit.jupiter.api.Test;
 
 import static io.nem.client.transaction.TransactionType.*;
-import static io.nem.client.transaction.version.Network.TEST;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DefaultVersionProviderTest {
@@ -12,8 +11,9 @@ class DefaultVersionProviderTest {
 
     @Test
     void returnCorrectVersion() {
-        assertEquals(-1744830463, versionProvider.version(TEST, TRANSFER_NEM));
-        assertEquals(-1744830462, versionProvider.version(TEST, TRANSFER_MOSAICS));
-        assertEquals(-1744830462, versionProvider.version(TEST, MULTISIG_AGGREGATE_MODIFICATION));
+        Network test = new Network(0x98, "TAMESPACEWH4MKFMBCVFERDPOOP4FK7MTDJEYP35");
+        assertEquals(-1744830463, versionProvider.version(test, TRANSFER_NEM));
+        assertEquals(-1744830462, versionProvider.version(test, TRANSFER_MOSAICS));
+        assertEquals(-1744830462, versionProvider.version(test, MULTISIG_AGGREGATE_MODIFICATION));
     }
 }

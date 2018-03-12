@@ -26,16 +26,18 @@ Import library as maven dependency
 </dependency>
 ```
 
-1. Configure library using archaius. </br>
+Configure library using archaius. </br>
 I used static config instance in tests to setup configuration:
 
 ```java
-getConfigInstance().setProperty("transactionApi.ribbon.listOfServers", "153.122.112.137:7890");
-getConfigInstance().setProperty("accountApi.ribbon.listOfServers", "153.122.112.137:7890");
-getConfigInstance().setProperty("mosaicApi.ribbon.listOfServers", "153.122.112.137:7890");
-getConfigInstance().setProperty("nodeApi.ribbon.listOfServers", "153.122.112.137:7890");
-getConfigInstance().setProperty("transaction.client.network", "TEST");
-getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", 20000);
+ConfigurationManager.getConfigInstance().setProperty("transactionApi.ribbon.listOfServers", "153.122.112.137:7890");
+ConfigurationManager.getConfigInstance().setProperty("accountApi.ribbon.listOfServers", "153.122.112.137:7890");
+ConfigurationManager.getConfigInstance().setProperty("mosaicApi.ribbon.listOfServers", "153.122.112.137:7890");
+ConfigurationManager.getConfigInstance().setProperty("nodeApi.ribbon.listOfServers", "153.122.112.137:7890");
+ConfigurationManager.getConfigInstance().setProperty("statusApi.ribbon.listOfServers", "153.122.112.137:7890");
+ConfigurationManager.getConfigInstance().setProperty("blockchainApi.ribbon.listOfServers", "153.122.112.137:7890");
+ConfigurationManager.getConfigInstance().setProperty("transaction.client.network", "TEST");
+ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", 20000);
 ```
 You can also use separate file(or any other configuration source archaius supports - https://github.com/Netflix/archaius/wiki) to setup configuration adding this to your application start up script:
 
@@ -44,7 +46,7 @@ You can also use separate file(or any other configuration source archaius suppor
 ```
 Example of properties file needed for MAIN network see at src/test/resources/nem-library.properties
 
-2. Create client instance using DefaultNemClientFactory:
+Create client instance using DefaultNemClientFactory:
 
 ```java
 AccountClient accountClient = new DefaultNemClientFactory().createAccountClient();
@@ -55,7 +57,7 @@ StatusClient statusClient = new DefaultNemClientFactory().createStatusClient();
 TransactionClient transactionClient = new DefaultNemClientFactory().createTransactionClient();
 ```
 
-3. Example of usage you can see in tests package src/test/java/io/nem/client
+Example of usage you can see in tests package src/test/java/io/nem/client
 
 
 You can support project if you want <br/>

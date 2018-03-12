@@ -25,7 +25,7 @@ class TransactionClientTest {
         getConfigInstance().setProperty("mosaicApi.ribbon.listOfServers", "153.122.112.137:7890");
         getConfigInstance().setProperty("nodeApi.ribbon.listOfServers", "153.122.112.137:7890");
         getConfigInstance().setProperty("transaction.client.network", "TEST");
-        getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", 20000);
+        getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", 30000);
     }
 
     @Test
