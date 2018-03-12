@@ -16,7 +16,7 @@ mvn clean install
 ```
 
 <h2>Usage</h2>
-<h3>1. Import library as maven dependency<h3>
+<h3>1. Import library as maven dependency</h3>
 
 ```xml
 <dependency>
@@ -46,7 +46,7 @@ You can also use separate file(or any other configuration source archaius suppor
 ```
 Example of properties file needed for MAIN network see at src/test/resources/nem-library.properties
 
-<h3>3. Create client instance using DefaultNemClientFactory<h3>
+<h3>3. Create client instance using DefaultNemClientFactory</h3>
 
 ```java
 AccountClient accountClient = new DefaultNemClientFactory().createAccountClient();
