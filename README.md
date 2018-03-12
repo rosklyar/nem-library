@@ -7,7 +7,7 @@ Uses:
 - archaius(https://github.com/Netflix/archaius) to configure library
 
 <h2>Install</h2>
-Just install library to local maven storage
+Just install library to local maven storage. I'm going to add it maven central in a few days.
 
 ```bash
 git clone https://github.com/rosklyar/nem-library.git
