@@ -16,7 +16,7 @@ mvn clean install
 ```
 
 <h2>Usage</h2>
-- Import library as maven dependency
+<h3>1. Import library as maven dependency<h3>
 
 ```xml
 <dependency>
@@ -26,7 +26,8 @@ mvn clean install
 </dependency>
 ```
 
-- Configure library using archaius. I used static config instance in tests to setup configuration:
+<h3>2. Configure library using archaius</h3>
+I used static config instance in tests to setup configuration:
 
 ```java
 ConfigurationManager.getConfigInstance().setProperty("transactionApi.ribbon.listOfServers", "153.122.112.137:7890");
@@ -45,7 +46,7 @@ You can also use separate file(or any other configuration source archaius suppor
 ```
 Example of properties file needed for MAIN network see at src/test/resources/nem-library.properties
 
-- Create client instance using DefaultNemClientFactory:
+<h3>3. Create client instance using DefaultNemClientFactory<h3>
 
 ```java
 AccountClient accountClient = new DefaultNemClientFactory().createAccountClient();
