@@ -29,21 +29,4 @@ public class ByteUtils {
     public static int isNegativeConstantTime(final int b) {
         return (b >> 8) & 1;
     }
-
-    /**
-     * Creates a human readable representation of an array of bytes.
-     *
-     * @param bytes The bytes.
-     * @return An string representation of the bytes.
-     */
-    public static String toString(final byte[] bytes) {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("{ ");
-        for (final byte b : bytes) {
-            builder.append(String.format("%02X ", (byte) (0xFF & b)));
-        }
-
-        builder.append("}");
-        return builder.toString();
-    }
 }
