@@ -4,6 +4,7 @@ Uses feign(https://github.com/OpenFeign/feign) to make http calls to NIS(based o
 
 <h2>Build</h2>
 Just install library to local maven storage
+
 ```bash
 git clone https://github.com/rosklyar/nem-library.git
 cd nem-library
