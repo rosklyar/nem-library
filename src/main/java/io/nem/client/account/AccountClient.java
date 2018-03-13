@@ -1,19 +1,19 @@
 package io.nem.client.account;
 
-import io.nem.client.account.request.AccountPrivateKeyTransactionsPage;
-import io.nem.client.account.request.PrivateKey;
-import io.nem.client.account.response.AccountMetaData;
-import io.nem.client.account.response.AccountMetaDataPair;
-import io.nem.client.common.KeyPair;
-import io.nem.client.account.response.UnlockedInfo;
-import io.nem.client.account.response.harvest.HarvestsResponse;
-import io.nem.client.account.response.history.HistoryResponse;
-import io.nem.client.account.response.importance.ImportanceResponse;
-import io.nem.client.account.response.mosaic.MosaicsResponse;
-import io.nem.client.account.response.mosaic.OwnedMosaicsResponse;
-import io.nem.client.account.response.namespace.NamespacesResponse;
-import io.nem.client.account.response.transaction.Transactions;
-import io.nem.client.account.response.transaction.UnconfirmedTransactions;
+import io.nem.client.account.domain.AccountPrivateKeyTransactionsPage;
+import io.nem.client.account.domain.PrivateKey;
+import io.nem.client.account.domain.AccountMetaData;
+import io.nem.client.account.domain.AccountMetaDataPair;
+import io.nem.client.account.domain.KeyPair;
+import io.nem.client.account.domain.UnlockedInfo;
+import io.nem.client.account.domain.harvest.HarvestsResponse;
+import io.nem.client.account.domain.history.HistoryResponse;
+import io.nem.client.account.domain.importance.ImportanceResponse;
+import io.nem.client.account.domain.mosaic.MosaicsResponse;
+import io.nem.client.account.domain.mosaic.OwnedMosaicsResponse;
+import io.nem.client.account.domain.namespace.NamespacesResponse;
+import io.nem.client.account.domain.transaction.Transactions;
+import io.nem.client.account.domain.transaction.UnconfirmedTransactions;
 
 public interface AccountClient {
 

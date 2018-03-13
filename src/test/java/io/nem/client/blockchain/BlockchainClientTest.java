@@ -1,11 +1,11 @@
 package io.nem.client.blockchain;
 
 import io.nem.client.DefaultNemClientFactory;
-import io.nem.client.blockchain.response.HeightResponse;
-import io.nem.client.blockchain.response.ScoreResponse;
-import io.nem.client.blockchain.response.block.Block;
-import io.nem.client.blockchain.response.block.BlockHeight;
-import io.nem.client.blockchain.response.block.BlocksAfterResponse;
+import io.nem.client.blockchain.domain.HeightResponse;
+import io.nem.client.blockchain.domain.ScoreResponse;
+import io.nem.client.blockchain.domain.block.Block;
+import io.nem.client.blockchain.domain.block.BlockHeight;
+import io.nem.client.blockchain.domain.block.BlocksAfterResponse;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class BlockchainClientTest {
 
-    private final BlockchainClient blockchainClient = new DefaultNemClientFactory().createBlockchainClient();
+    private final BlockchainClient blockchainClient = new DefaultNemClientFactory().createBlockchainClient("blockchainApi");
 
     @BeforeAll
     static void init() {

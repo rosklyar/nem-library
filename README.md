@@ -36,7 +36,6 @@ ConfigurationManager.getConfigInstance().setProperty("mosaicApi.ribbon.listOfSer
 ConfigurationManager.getConfigInstance().setProperty("nodeApi.ribbon.listOfServers", "153.122.112.137:7890");
 ConfigurationManager.getConfigInstance().setProperty("statusApi.ribbon.listOfServers", "153.122.112.137:7890");
 ConfigurationManager.getConfigInstance().setProperty("blockchainApi.ribbon.listOfServers", "153.122.112.137:7890");
-ConfigurationManager.getConfigInstance().setProperty("transaction.client.network", "TEST");
 ConfigurationManager.getConfigInstance().setProperty("hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds", 20000);
 ```
 You can also use separate file(or any other configuration source archaius supports - https://github.com/Netflix/archaius/wiki) to setup configuration. Add this to your application start up script to import configuration from file:
@@ -52,14 +51,23 @@ You also can configure hystrix(circuit breaker) and ribbon(load balancing) with 
 <h3>3. Create client instance using DefaultNemClientFactory</h3>
 
 ```java
-AccountClient accountClient = new DefaultNemClientFactory().createAccountClient();
-BlockchainClient blockchainClient = new DefaultNemClientFactory().createBlockchainClient();
-MosaicClient mosaicClient = new DefaultNemClientFactory().createMosaicClient();
-NodeClient nodeClient = new DefaultNemClientFactory().createNodeClient();
-StatusClient statusClient = new DefaultNemClientFactory().createStatusClient();
-TransactionClient transactionClient = new DefaultNemClientFactory().createTransactionClient();
+AccountClient accountClient = new DefaultNemClientFactory().createAccountClient("accountApi");
+BlockchainClient blockchainClient = new DefaultNemClientFactory().createBlockchainClient("blockchainApi");
+MosaicClient mosaicClient = new DefaultNemClientFactory().createMosaicClient("mosaicApi");
+NodeClient nodeClient = new DefaultNemClientFactory().createNodeClient("nodeApi");
+StatusClient statusClient = new DefaultNemClientFactory().createStatusClient("statusApi");
 ```
 
+```java
+DefaultNemClientFactory factory = new DefaultNemClientFactory();
+        transactionClient = factory.createTransactionClient(
+                "transactionApi",
+                DefaultNemClientFactory.MAIN,
+                mosaicClient,
+                accountClient,
+                nodeClient
+        );
+```
 Example of usage you can see in tests package src/test/java/io/nem/client
 
 You can support project if you want <br/>

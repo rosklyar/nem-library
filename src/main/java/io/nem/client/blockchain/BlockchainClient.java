@@ -1,10 +1,10 @@
 package io.nem.client.blockchain;
 
-import io.nem.client.blockchain.response.block.BlockHeight;
-import io.nem.client.blockchain.response.HeightResponse;
-import io.nem.client.blockchain.response.ScoreResponse;
-import io.nem.client.blockchain.response.block.Block;
-import io.nem.client.blockchain.response.block.BlocksAfterResponse;
+import io.nem.client.blockchain.domain.block.BlockHeight;
+import io.nem.client.blockchain.domain.HeightResponse;
+import io.nem.client.blockchain.domain.ScoreResponse;
+import io.nem.client.blockchain.domain.block.Block;
+import io.nem.client.blockchain.domain.block.BlocksAfterResponse;
 
 
 public interface BlockchainClient {

@@ -1,8 +1,11 @@
 package io.nem.client.transaction;
 
-import io.nem.client.common.transaction.importance.Action;
-import io.nem.client.common.transaction.mosaic.MosaicTransfer;
-import io.nem.client.transaction.response.NemAnnounceResult;
+import io.nem.client.mosaic.domain.Levy;
+import io.nem.client.transaction.domain.importance.Action;
+import io.nem.client.transaction.domain.mosaic.MosaicId;
+import io.nem.client.transaction.domain.mosaic.MosaicProperties;
+import io.nem.client.transaction.domain.mosaic.MosaicTransfer;
+import io.nem.client.transaction.domain.NemAnnounceResult;
 
 import java.util.List;
 
@@ -27,5 +30,7 @@ public interface TransactionClient {
     NemAnnounceResult createNamespace(String privateKey, String parentNamespace, String namespace, int timeToLiveInSeconds);
 
     NemAnnounceResult importanceTransfer(String privateKey, Action action, String remoteAccountPublicKey, int timeToLiveInSeconds);
+
+    NemAnnounceResult createMosaic(String privateKey, MosaicId mosaicId, String mosaicDescription, MosaicProperties mosaicProperties, Levy levy, int timeToLiveInSeconds);
 
 }

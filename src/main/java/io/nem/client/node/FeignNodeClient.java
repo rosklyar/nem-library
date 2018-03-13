@@ -2,9 +2,8 @@ package io.nem.client.node;
 
 import feign.Headers;
 import feign.RequestLine;
-import io.nem.client.blockchain.response.block.BlockHeight;
-import io.nem.client.node.request.BootNodeRequest;
-import io.nem.client.node.response.*;
+import io.nem.client.blockchain.domain.block.BlockHeight;
+import io.nem.client.node.domain.*;
 
 @Headers({"Accept: application/json"})
 public interface FeignNodeClient extends NodeClient {

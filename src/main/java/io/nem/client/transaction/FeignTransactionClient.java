@@ -2,8 +2,8 @@ package io.nem.client.transaction;
 
 import feign.Headers;
 import feign.RequestLine;
-import io.nem.client.transaction.request.RequestAnnounce;
-import io.nem.client.transaction.response.NemAnnounceResult;
+import io.nem.client.transaction.domain.RequestAnnounce;
+import io.nem.client.transaction.domain.NemAnnounceResult;
 
 @Headers({"Accept: application/json"})
 public interface FeignTransactionClient {

@@ -6,18 +6,19 @@ import io.nem.client.mosaic.MosaicClient;
 import io.nem.client.node.NodeClient;
 import io.nem.client.status.StatusClient;
 import io.nem.client.transaction.TransactionClient;
+import io.nem.client.transaction.version.Network;
 
 public interface NemClientFactory {
 
-    StatusClient createStatusClient();
+    StatusClient createStatusClient(String configurationPrefix);
 
-    AccountClient createAccountClient();
+    AccountClient createAccountClient(String configurationPrefix);
 
-    BlockchainClient createBlockchainClient();
+    BlockchainClient createBlockchainClient(String configurationPrefix);
 
-    NodeClient createNodeClient();
+    NodeClient createNodeClient(String configurationPrefix);
 
-    MosaicClient createMosaicClient();
+    MosaicClient createMosaicClient(String configurationPrefix);
 
-    TransactionClient createTransactionClient();
+    TransactionClient createTransactionClient(String configurationPrefix, Network network, MosaicClient mosaicClient, AccountClient accountClient, NodeClient nodeClient);
 }

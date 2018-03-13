@@ -1,9 +1,9 @@
 package io.nem.client.mosaic;
 
 import io.nem.client.DefaultNemClientFactory;
-import io.nem.client.mosaic.response.MosaicsMetaDataResponse;
-import io.nem.client.mosaic.response.Namespace;
-import io.nem.client.mosaic.response.NamespacesMetaDataResponse;
+import io.nem.client.mosaic.domain.MosaicsMetaDataResponse;
+import io.nem.client.mosaic.domain.Namespace;
+import io.nem.client.mosaic.domain.NamespacesMetaDataResponse;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MosaicClientTest {
 
-    private final MosaicClient mosaicClient = new DefaultNemClientFactory().createMosaicClient();
+    private final MosaicClient mosaicClient = new DefaultNemClientFactory().createMosaicClient("mosaicApi");
 
     @BeforeAll
     static void init() {

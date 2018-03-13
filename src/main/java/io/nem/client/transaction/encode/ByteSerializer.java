@@ -1,8 +1,8 @@
 package io.nem.client.transaction.encode;
 
-import io.nem.client.common.Message;
-import io.nem.client.common.transaction.mosaic.MosaicTransfer;
-import io.nem.client.common.transaction.multisig.Modification;
+import io.nem.client.account.domain.Message;
+import io.nem.client.transaction.domain.mosaic.MosaicTransfer;
+import io.nem.client.transaction.domain.multisig.Modification;
 
 public interface ByteSerializer {
     byte[] intToByte(int number);

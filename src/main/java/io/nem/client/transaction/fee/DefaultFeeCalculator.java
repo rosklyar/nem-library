@@ -1,11 +1,11 @@
 package io.nem.client.transaction.fee;
 
 import io.nem.client.account.AccountClient;
-import io.nem.client.account.response.mosaic.OwnedMosaicsResponse;
-import io.nem.client.common.transaction.mosaic.MosaicTransfer;
+import io.nem.client.account.domain.mosaic.OwnedMosaicsResponse;
 import io.nem.client.mosaic.MosaicClient;
-import io.nem.client.mosaic.response.MosaicMetaData;
-import io.nem.client.mosaic.response.MosaicsMetaDataResponse;
+import io.nem.client.mosaic.domain.MosaicMetaData;
+import io.nem.client.mosaic.domain.MosaicsMetaDataResponse;
+import io.nem.client.transaction.domain.mosaic.MosaicTransfer;
 
 import java.util.List;
 
@@ -74,6 +74,16 @@ public class DefaultFeeCalculator implements FeeCalculator {
     @Override
     public long importanceTransferFee() {
         return 3L * feeUnit;
+    }
+
+    @Override
+    public long mosaicCreationFee() {
+        return 3L * feeUnit;
+    }
+
+    @Override
+    public long mosaicRentalFee() {
+        return 200L * feeUnit;
     }
 
     private long mosaicFee(MosaicTransfer mosaicTransfer, int times) {

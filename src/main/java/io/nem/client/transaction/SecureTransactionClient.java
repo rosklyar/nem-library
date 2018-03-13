@@ -1,30 +1,33 @@
 package io.nem.client.transaction;
 
-import io.nem.client.common.Hash;
-import io.nem.client.common.Message;
-import io.nem.client.common.transaction.ProvisionNamespaceTransaction;
-import io.nem.client.common.transaction.Transaction;
-import io.nem.client.common.transaction.importance.Action;
-import io.nem.client.common.transaction.importance.ImportanceTransferTransaction;
-import io.nem.client.common.transaction.mosaic.MosaicTransfer;
-import io.nem.client.common.transaction.multisig.Modification;
-import io.nem.client.common.transaction.multisig.RelativeChange;
+import io.nem.client.account.domain.Hash;
+import io.nem.client.account.domain.Message;
+import io.nem.client.mosaic.domain.Levy;
+import io.nem.client.mosaic.domain.MosaicProperty;
 import io.nem.client.node.NodeClient;
 import io.nem.client.transaction.encode.DefaultSigner;
 import io.nem.client.transaction.encode.HexConverter;
 import io.nem.client.transaction.encode.Signer;
 import io.nem.client.transaction.encode.TransactionEncoder;
 import io.nem.client.transaction.fee.FeeCalculator;
-import io.nem.client.transaction.request.RequestAnnounce;
-import io.nem.client.transaction.response.NemAnnounceResult;
+import io.nem.client.transaction.domain.ProvisionNamespaceTransaction;
+import io.nem.client.transaction.domain.RequestAnnounce;
+import io.nem.client.transaction.domain.Transaction;
+import io.nem.client.transaction.domain.importance.Action;
+import io.nem.client.transaction.domain.importance.ImportanceTransferTransaction;
+import io.nem.client.transaction.domain.mosaic.*;
+import io.nem.client.transaction.domain.multisig.Modification;
+import io.nem.client.transaction.domain.multisig.RelativeChange;
+import io.nem.client.transaction.domain.NemAnnounceResult;
 import io.nem.client.transaction.version.Network;
 import io.nem.client.transaction.version.VersionProvider;
 
 import java.util.List;
 
-import static io.nem.client.common.transaction.multisig.ModificationType.ADD_COSIGNATORY;
-import static io.nem.client.common.transaction.multisig.ModificationType.REMOVE_COSIGNATORY;
+import static com.google.common.collect.Lists.newArrayList;
 import static io.nem.client.transaction.TransactionType.*;
+import static io.nem.client.transaction.domain.multisig.ModificationType.ADD_COSIGNATORY;
+import static io.nem.client.transaction.domain.multisig.ModificationType.REMOVE_COSIGNATORY;
 import static java.math.BigInteger.TEN;
 import static java.util.stream.Collectors.toList;
 
@@ -218,6 +221,42 @@ public class SecureTransactionClient implements TransactionClient {
                 .build();
 
         byte[] data = transactionEncoder.data(transaction);
+
+        return feignTransactionClient.prepare(new RequestAnnounce(hexConverter.getString(data), signer.sign(data)));
+    }
+
+    @Override
+    public NemAnnounceResult createMosaic(String privateKey, MosaicId mosaicId, String mosaicDescription, MosaicProperties mosaicProperties, Levy levy, int timeToLiveInSeconds) {
+        Signer signer = new DefaultSigner(privateKey);
+        int currentTime = nodeClient.extendedInfo().nisInfo.currentTime;
+        String publicKey = signer.publicKey();
+
+        MosaicDefinition mosaicDefinition = MosaicDefinition.builder()
+                .creator(publicKey)
+                .id(mosaicId)
+                .description(mosaicDescription)
+                .levy(levy)
+                .properties(newArrayList(
+                        new MosaicProperty("divisibility", String.valueOf(mosaicProperties.divisibility)),
+                        new MosaicProperty("initialSupply", String.valueOf(mosaicProperties.initialSupply)),
+                        new MosaicProperty("supplyMutable", String.valueOf(mosaicProperties.supplyMutable)),
+                        new MosaicProperty("transferable", String.valueOf(mosaicProperties.transferable))
+                ))
+                .build();
+
+        MosaicDefinitionCreationTransaction mosaicDefinitionCreationTransaction = MosaicDefinitionCreationTransaction.builder()
+                .type(MOSAIC_DEFINITION_CREATION.type)
+                .version(versionProvider.version(network, MOSAIC_DEFINITION_CREATION))
+                .timeStamp(currentTime)
+                .signer(publicKey)
+                .fee(feeCalculator.mosaicCreationFee())
+                .deadline(currentTime + timeToLiveInSeconds)
+                .creationFee(feeCalculator.mosaicRentalFee())
+                .creationFeeSink(network.creationFeeSink)
+                .mosaicDefinition(mosaicDefinition)
+                .build();
+
+        byte[] data = transactionEncoder.data(mosaicDefinitionCreationTransaction);
 
         return feignTransactionClient.prepare(new RequestAnnounce(hexConverter.getString(data), signer.sign(data)));
     }

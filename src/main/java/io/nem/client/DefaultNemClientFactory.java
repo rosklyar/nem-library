@@ -22,103 +22,76 @@ import io.nem.client.transaction.fee.FeeCalculator;
 import io.nem.client.transaction.version.DefaultVersionProvider;
 import io.nem.client.transaction.version.Network;
 import io.nem.client.transaction.version.VersionProvider;
-import org.apache.commons.configuration.ConfigurationRuntimeException;
 
-import java.util.Map;
-
-import static com.google.common.collect.ImmutableMap.of;
-import static com.netflix.config.ConfigurationManager.getConfigInstance;
 import static feign.hystrix.HystrixFeign.builder;
 import static java.lang.String.format;
-import static org.apache.commons.lang.StringUtils.isEmpty;
 
 public class DefaultNemClientFactory implements NemClientFactory {
 
-    private final Map<String, Integer> networkNameToNetworkCode = of(
-            "MAIN", 0x68,
-            "TEST", 0x98,
-            "MIJIN", 0x60
-    );
-
-    private final Map<String, String> networkNameToRentalFeeSink = of(
-            "MAIN", "NAMESPACEWH4MKFMBCVFERDPOOP4FK7MTBXDPZZA",
-            "TEST", "TAMESPACEWH4MKFMBCVFERDPOOP4FK7MTDJEYP35"
-    );
+    public final static Network MAIN = new Network(0x68, "NAMESPACEWH4MKFMBCVFERDPOOP4FK7MTBXDPZZA", "NBMOSAICOD4F54EE5CDMR23CCBGOAM2XSIUX6TRS");
+    public final static Network TEST = new Network(0x98, "TAMESPACEWH4MKFMBCVFERDPOOP4FK7MTDJEYP35", "TBMOSAICOD4F54EE5CDMR23CCBGOAM2XSJBR5OLC");
 
     @Override
-    public StatusClient createStatusClient() {
+    public StatusClient createStatusClient(String configurationPrefix) {
         return builder()
                 .client(RibbonClient.create())
                 .encoder(new JacksonEncoder())
                 .decoder(new JacksonDecoder())
-                .target(FeignStatusClient.class, "http://statusApi");
+                .target(FeignStatusClient.class, format("http://%s", configurationPrefix));
     }
 
     @Override
-    public AccountClient createAccountClient() {
+    public AccountClient createAccountClient(String configurationPrefix) {
         return builder()
                 .client(RibbonClient.create())
                 .encoder(new JacksonEncoder())
                 .decoder(new JacksonDecoder())
-                .target(FeignAccountClient.class, "http://accountApi");
+                .target(FeignAccountClient.class, format("http://%s", configurationPrefix));
     }
 
     @Override
-    public BlockchainClient createBlockchainClient() {
+    public BlockchainClient createBlockchainClient(String configurationPrefix) {
         return builder()
                 .client(RibbonClient.create())
                 .encoder(new JacksonEncoder())
                 .decoder(new JacksonDecoder())
-                .target(FeignBlockchainClient.class, "http://blockchainApi");
+                .target(FeignBlockchainClient.class, format("http://%s", configurationPrefix));
     }
 
     @Override
-    public NodeClient createNodeClient() {
+    public NodeClient createNodeClient(String configurationPrefix) {
         return builder()
                 .client(RibbonClient.create())
                 .encoder(new JacksonEncoder())
                 .decoder(new JacksonDecoder())
-                .target(FeignNodeClient.class, "http://nodeApi");
+                .target(FeignNodeClient.class, format("http://%s", configurationPrefix));
     }
 
     @Override
-    public MosaicClient createMosaicClient() {
+    public MosaicClient createMosaicClient(String configurationPrefix) {
         return builder()
                 .client(RibbonClient.create())
                 .encoder(new JacksonEncoder())
                 .decoder(new JacksonDecoder())
-                .target(FeignMosaicClient.class, "http://mosaicApi");
+                .target(FeignMosaicClient.class, format("http://%s", configurationPrefix));
     }
 
     @Override
-    public TransactionClient createTransactionClient() {
+    public TransactionClient createTransactionClient(String configurationPrefix,
+                                                     Network network,
+                                                     MosaicClient mosaicClient,
+                                                     AccountClient accountClient,
+                                                     NodeClient nodeClient) {
         FeignTransactionClient feignTransactionClient = builder()
                 .client(RibbonClient.create())
                 .encoder(new JacksonEncoder())
                 .decoder(new JacksonDecoder())
-                .target(FeignTransactionClient.class, "http://transactionApi");
+                .target(FeignTransactionClient.class, format("http://%s", configurationPrefix));
         HexConverter hexConverter = new DefaultHexConverter();
         ByteSerializer byteSerializer = new DefaultByteSerializer(hexConverter);
         TransactionEncoder transactionEncoder = new ByteArrayTransactionEncoder(byteSerializer, hexConverter);
         VersionProvider versionProvider = new DefaultVersionProvider();
-        MosaicClient mosaicClient = createMosaicClient();
-        AccountClient accountClient = createAccountClient();
         FeeCalculator feeCalculator = new DefaultFeeCalculator(mosaicClient, accountClient);
-        NodeClient nodeClient = createNodeClient();
-        Network network = getNetwork();
         return new SecureTransactionClient(network, feignTransactionClient, transactionEncoder, hexConverter, versionProvider, feeCalculator, nodeClient);
-    }
-
-    private Network getNetwork() {
-        String networkName = getConfigInstance().getString("transaction.client.network");
-        if (isEmpty(networkName)) {
-            throw new ConfigurationRuntimeException("NEM network must be configured. Setup configuration property 'transaction.client.network' with MAIN, TEST or MIJIN value");
-        }
-        String rentalFeeSink = getConfigInstance().getString("transaction.client.network.rentalFeeSink");
-        Integer code = networkNameToNetworkCode.get(networkName);
-        if (code == null) {
-            throw new ConfigurationRuntimeException(format("'%s' is not recognized NEM network value. Setup configuration property 'transaction.client.network' with MAIN, TEST or MIJIN value", networkName));
-        }
-        return new Network(code, rentalFeeSink != null ? rentalFeeSink : networkNameToRentalFeeSink.get(networkName));
     }
 }

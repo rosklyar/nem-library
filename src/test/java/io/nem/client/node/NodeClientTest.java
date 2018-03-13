@@ -1,11 +1,8 @@
 package io.nem.client.node;
 
 import io.nem.client.DefaultNemClientFactory;
-import io.nem.client.blockchain.response.block.BlockHeight;
-import io.nem.client.node.request.ApplicationMetaData;
-import io.nem.client.node.request.BootNodeRequest;
-import io.nem.client.node.request.PrivateIdentity;
-import io.nem.client.node.response.*;
+import io.nem.client.blockchain.domain.block.BlockHeight;
+import io.nem.client.node.domain.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -16,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class NodeClientTest {
 
     private static String IP = "153.122.112.137";
-    private final NodeClient nodeClient = new DefaultNemClientFactory().createNodeClient();
+    private final NodeClient nodeClient = new DefaultNemClientFactory().createNodeClient("nodeApi");
 
     private final String privateKey = "0476fd96242ac5ef6cb1b268887254c1a3089759556beb1ce660c0cb2c42bb27";
 

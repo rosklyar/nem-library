@@ -1,8 +1,8 @@
 package io.nem.client.status;
 
 import io.nem.client.DefaultNemClientFactory;
-import io.nem.client.status.response.Heartbeat;
-import io.nem.client.status.response.Status;
+import io.nem.client.status.domain.Heartbeat;
+import io.nem.client.status.domain.Status;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class StatusClientTest {
 
-    private final StatusClient statusClient = new DefaultNemClientFactory().createStatusClient();
+    private final StatusClient statusClient = new DefaultNemClientFactory().createStatusClient("statusApi");
 
     @BeforeAll
     static void init() {

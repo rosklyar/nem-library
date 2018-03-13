@@ -3,9 +3,9 @@ package io.nem.client.mosaic;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
-import io.nem.client.mosaic.response.MosaicsMetaDataResponse;
-import io.nem.client.mosaic.response.Namespace;
-import io.nem.client.mosaic.response.NamespacesMetaDataResponse;
+import io.nem.client.mosaic.domain.MosaicsMetaDataResponse;
+import io.nem.client.mosaic.domain.Namespace;
+import io.nem.client.mosaic.domain.NamespacesMetaDataResponse;
 
 @Headers({"Accept: application/json"})
 public interface FeignMosaicClient extends MosaicClient {

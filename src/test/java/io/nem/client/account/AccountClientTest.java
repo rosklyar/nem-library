@@ -2,23 +2,23 @@ package io.nem.client.account;
 
 import feign.FeignException;
 import io.nem.client.DefaultNemClientFactory;
-import io.nem.client.account.request.AccountPrivateKeyTransactionsPage;
-import io.nem.client.account.request.PrivateKey;
-import io.nem.client.account.response.AccountInfo;
-import io.nem.client.account.response.AccountMetaData;
-import io.nem.client.account.response.AccountMetaDataPair;
-import io.nem.client.account.response.UnlockedInfo;
-import io.nem.client.account.response.harvest.HarvestInfo;
-import io.nem.client.account.response.history.HistoryResponse;
-import io.nem.client.account.response.importance.ImportanceResponse;
-import io.nem.client.account.response.mosaic.MosaicsResponse;
-import io.nem.client.account.response.mosaic.OwnedMosaic;
-import io.nem.client.account.response.mosaic.OwnedMosaicsResponse;
-import io.nem.client.account.response.namespace.NamespacesResponse;
-import io.nem.client.account.response.transaction.Transactions;
-import io.nem.client.account.response.transaction.UnconfirmedTransactions;
-import io.nem.client.common.KeyPair;
-import io.nem.client.common.transaction.mosaic.MosaicId;
+import io.nem.client.account.domain.AccountPrivateKeyTransactionsPage;
+import io.nem.client.account.domain.PrivateKey;
+import io.nem.client.account.domain.AccountInfo;
+import io.nem.client.account.domain.AccountMetaData;
+import io.nem.client.account.domain.AccountMetaDataPair;
+import io.nem.client.account.domain.UnlockedInfo;
+import io.nem.client.account.domain.harvest.HarvestInfo;
+import io.nem.client.account.domain.history.HistoryResponse;
+import io.nem.client.account.domain.importance.ImportanceResponse;
+import io.nem.client.account.domain.mosaic.MosaicsResponse;
+import io.nem.client.account.domain.mosaic.OwnedMosaic;
+import io.nem.client.account.domain.mosaic.OwnedMosaicsResponse;
+import io.nem.client.account.domain.namespace.NamespacesResponse;
+import io.nem.client.account.domain.transaction.Transactions;
+import io.nem.client.account.domain.transaction.UnconfirmedTransactions;
+import io.nem.client.account.domain.KeyPair;
+import io.nem.client.transaction.domain.mosaic.MosaicId;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -27,14 +27,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.netflix.config.ConfigurationManager.getConfigInstance;
-import static io.nem.client.account.response.AccountMetaData.RemoteStatus.INACTIVE;
-import static io.nem.client.account.response.AccountMetaData.Status.LOCKED;
+import static io.nem.client.account.domain.AccountMetaData.RemoteStatus.INACTIVE;
+import static io.nem.client.account.domain.AccountMetaData.Status.LOCKED;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 class AccountClientTest {
 
-    private AccountClient accountClient = new DefaultNemClientFactory().createAccountClient();
+    private AccountClient accountClient = new DefaultNemClientFactory().createAccountClient("accountApi");
 
     private final String address = "TAVNDWBJFJHZYD3YYWJPDQ345ZAZIYEB2LJXSG65";
     private final String cosignatoryAddress = "TBNDMABIECCN6EQY5WVNJZMCXAUVTN7RKGZH4CP4";

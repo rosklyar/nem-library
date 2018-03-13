@@ -1,8 +1,15 @@
 package io.nem.client.transaction.encode;
 
-import io.nem.client.common.transaction.ProvisionNamespaceTransaction;
-import io.nem.client.common.transaction.Transaction;
-import io.nem.client.common.transaction.importance.ImportanceTransferTransaction;
+import io.nem.client.mosaic.domain.Levy;
+import io.nem.client.mosaic.domain.MosaicProperty;
+import io.nem.client.transaction.domain.ProvisionNamespaceTransaction;
+import io.nem.client.transaction.domain.Transaction;
+import io.nem.client.transaction.domain.importance.ImportanceTransferTransaction;
+import io.nem.client.transaction.domain.mosaic.MosaicDefinition;
+import io.nem.client.transaction.domain.mosaic.MosaicDefinitionCreationTransaction;
+import io.nem.client.transaction.domain.mosaic.MosaicId;
+
+import java.util.List;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.primitives.Bytes.concat;
@@ -76,6 +83,84 @@ public class ByteArrayTransactionEncoder implements TransactionEncoder {
                 byteSerializer.intToByte(transaction.action.mode),
                 byteSerializer.intToByte(numberOfBytesInPublicKey),
                 hexConverter.getBytes(transaction.remoteAccount)
+        );
+    }
+
+    @Override
+    public byte[] data(MosaicDefinitionCreationTransaction transaction) {
+        byte[] mosaicDefinitionData = mosaicDefinitionData(transaction.mosaicDefinition);
+        return concat(
+                byteSerializer.intToByte(transaction.type),
+                byteSerializer.intToByte(transaction.version),
+                byteSerializer.intToByte(transaction.timeStamp),
+                byteSerializer.intToByte(numberOfBytesInPublicKey),
+                hexConverter.getBytes(transaction.signer),
+                byteSerializer.longToByte(transaction.fee),
+                byteSerializer.intToByte(transaction.deadline),
+                byteSerializer.intToByte(mosaicDefinitionData.length),
+                mosaicDefinitionData,
+                byteSerializer.intToByte(numberOfBytesInAddress),
+                byteSerializer.stringToBytes(transaction.creationFeeSink),
+                byteSerializer.longToByte(transaction.creationFee)
+        );
+    }
+
+    private byte[] mosaicDefinitionData(MosaicDefinition mosaicDefinition) {
+        byte[] mosaicIdData = mosaicIdData(mosaicDefinition.id);
+        byte[] levyData = levyData(mosaicDefinition.levy);
+        return concat(
+                byteSerializer.intToByte(numberOfBytesInPublicKey),
+                hexConverter.getBytes(mosaicDefinition.creator),
+                byteSerializer.intToByte(mosaicIdData.length),
+                mosaicIdData,
+                byteSerializer.intToByte(mosaicDefinition.description.length()),
+                byteSerializer.stringToBytes(mosaicDefinition.description),
+                mosaicPropertiesData(mosaicDefinition.properties),
+                byteSerializer.intToByte(levyData.length),
+                levyData
+        );
+    }
+
+    private byte[] mosaicIdData(MosaicId mosaicId) {
+        return concat(
+                byteSerializer.intToByte(mosaicId.namespaceId.length()),
+                byteSerializer.stringToBytes(mosaicId.namespaceId),
+                byteSerializer.intToByte(mosaicId.name.length()),
+                byteSerializer.stringToBytes(mosaicId.name)
+        );
+    }
+
+    private byte[] levyData(Levy levy) {
+        if (levy == null) {
+            return new byte[0];
+        }
+        byte[] mosaicIdData = mosaicIdData(levy.mosaicId);
+        return concat(
+                byteSerializer.intToByte(levy.type),
+                byteSerializer.intToByte(numberOfBytesInAddress),
+                byteSerializer.stringToBytes(levy.recipient),
+                byteSerializer.intToByte(mosaicIdData.length),
+                mosaicIdData,
+                byteSerializer.longToByte(levy.fee)
+        );
+    }
+
+    private byte[] mosaicPropertiesData(List<MosaicProperty> mosaicProperties) {
+        return mosaicProperties.stream()
+                .map(this::mosaicPropertyData)
+                .reduce(byteSerializer.intToByte(mosaicProperties.size()), (b1, b2) -> concat(b1, b2));
+    }
+
+    private byte[] mosaicPropertyData(MosaicProperty mosaicProperty) {
+        byte[] propertyStructure = concat(
+                byteSerializer.intToByte(mosaicProperty.name.length()),
+                byteSerializer.stringToBytes(mosaicProperty.name),
+                byteSerializer.intToByte(mosaicProperty.value.length()),
+                byteSerializer.stringToBytes(mosaicProperty.value)
+        );
+        return concat(
+                byteSerializer.intToByte(propertyStructure.length),
+                propertyStructure
         );
     }
 

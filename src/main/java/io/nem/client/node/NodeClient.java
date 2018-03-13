@@ -1,8 +1,7 @@
 package io.nem.client.node;
 
-import io.nem.client.blockchain.response.block.BlockHeight;
-import io.nem.client.node.request.BootNodeRequest;
-import io.nem.client.node.response.*;
+import io.nem.client.blockchain.domain.block.BlockHeight;
+import io.nem.client.node.domain.*;
 
 public interface NodeClient {
 
