@@ -20,7 +20,7 @@ mvn clean install
 
 ```xml
 <dependency>
-    <groupId>io.nem</groupId>
+    <groupId>com.github.rosklyar</groupId>
     <artifactId>nem-library</artifactId>
     <version>1.0-SNAPSHOT</version>
 </dependency>
@@ -68,7 +68,7 @@ DefaultNemClientFactory factory = new DefaultNemClientFactory();
                 nodeClient
         );
 ```
-Example of usage you can see in tests package src/test/java/io/nem/client
+Example of usage you can see in tests package src/test/java/com/github/rosklyar/client
 
 You can support project if you want <br/>
 XEM: NALNZB-Q4JJP2-PYAS6I-4KWTLT-367SJJ-RKXX6I-WUQR <br/>
