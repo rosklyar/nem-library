@@ -47,7 +47,8 @@ public class SecureTransactionClient implements TransactionClient {
                                    TransactionEncoder transactionEncoder,
                                    HexConverter hexConverter,
                                    VersionProvider versionProvider,
-                                   FeeCalculator feeCalculator, NodeClient nodeClient) {
+                                   FeeCalculator feeCalculator,
+                                   NodeClient nodeClient) {
         this.network = network;
         this.feignTransactionClient = feignTransactionClient;
         this.transactionEncoder = transactionEncoder;
@@ -258,6 +259,28 @@ public class SecureTransactionClient implements TransactionClient {
                 .build();
 
         byte[] data = transactionEncoder.data(mosaicDefinitionCreationTransaction);
+
+        return feignTransactionClient.prepare(new RequestAnnounce(hexConverter.getString(data), signer.sign(data)));
+    }
+
+    @Override
+    public NemAnnounceResult changeMosaicSupply(String privateKey, MosaicId mosaicId, SupplyType supplyType, long amount, int timeToLiveInSeconds) {
+        Signer signer = new DefaultSigner(privateKey);
+        int currentTime = nodeClient.extendedInfo().nisInfo.currentTime;
+
+        MosaicSupplyChangeTransaction transaction = MosaicSupplyChangeTransaction.builder()
+                .type(MOSAIC_SUPPLY_CHANGE.type)
+                .version(versionProvider.version(network, MOSAIC_SUPPLY_CHANGE))
+                .timeStamp(currentTime)
+                .signer(signer.publicKey())
+                .fee(feeCalculator.importanceTransferFee())
+                .deadline(currentTime + timeToLiveInSeconds)
+                .mosaicId(mosaicId)
+                .supplyType(supplyType)
+                .delta(amount)
+                .build();
+
+        byte[] data = transactionEncoder.data(transaction);
 
         return feignTransactionClient.prepare(new RequestAnnounce(hexConverter.getString(data), signer.sign(data)));
     }

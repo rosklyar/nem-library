@@ -12,13 +12,25 @@ public interface NemClientFactory {
 
     StatusClient createStatusClient(String configurationPrefix);
 
+    StatusClient simpleStatusClient(String url);
+
     AccountClient createAccountClient(String configurationPrefix);
+
+    AccountClient simpleAccountClient(String url);
 
     BlockchainClient createBlockchainClient(String configurationPrefix);
 
+    BlockchainClient simpleBlockchainClient(String url);
+
     NodeClient createNodeClient(String configurationPrefix);
+
+    NodeClient simpleNodeClient(String url);
 
     MosaicClient createMosaicClient(String configurationPrefix);
 
+    MosaicClient simpleMosaicClient(String url);
+
     TransactionClient createTransactionClient(String configurationPrefix, Network network, MosaicClient mosaicClient, AccountClient accountClient, NodeClient nodeClient);
+
+    TransactionClient simpleTransactionClient(String url, Network network);
 }

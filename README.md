@@ -68,6 +68,20 @@ DefaultNemClientFactory factory = new DefaultNemClientFactory();
                 nodeClient
         );
 ```
+
+<h2>Simple clients</h2>
+
+You can create needed clients much more simple using just url of desired NIS:
+
+```java
+AccountClient accountClient = new DefaultNemClientFactory().simpleAccountClient("http://153.122.112.137:7890");
+BlockchainClient blockchainClient = new DefaultNemClientFactory().simpleBlockchainClient("http://153.122.112.137:7890");
+MosaicClient mosaicClient = new DefaultNemClientFactory().simpleMosaicClient("http://153.122.112.137:7890");
+NodeClient nodeClient = new DefaultNemClientFactory().simpleNodeClient("http://153.122.112.137:7890");
+StatusClient statusClient = new DefaultNemClientFactory().simpleStatusClient("http://153.122.112.137:7890");
+TransactionClient simpleTransactionClient = new DefaultNemClientFactory().simpleTransactionClient("http://153.122.112.137:7890", DefaultNemClientFactory.MAIN);
+```
+
 Example of usage you can see in tests package src/test/java/com/github/rosklyar/client
 
 You can support project if you want <br/>

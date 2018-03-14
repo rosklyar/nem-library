@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class BlockchainClientTest {
 
     private final BlockchainClient blockchainClient = new DefaultNemClientFactory().createBlockchainClient("blockchainApi");
+    private final BlockchainClient simpleBlockchainClient = new DefaultNemClientFactory().simpleBlockchainClient("http://153.122.112.137:7890");
 
     @BeforeAll
     static void init() {
@@ -38,6 +39,7 @@ class BlockchainClientTest {
     @Test
     void getLastBlock() {
         Block lastBlock = blockchainClient.lastBlock();
+        assertEquals(lastBlock, simpleBlockchainClient.lastBlock());
         assertTrue(lastBlock.height > 0);
     }
 

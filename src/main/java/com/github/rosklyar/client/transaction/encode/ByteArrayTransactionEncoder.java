@@ -1,13 +1,14 @@
 package com.github.rosklyar.client.transaction.encode;
 
+import com.github.rosklyar.client.mosaic.domain.Levy;
 import com.github.rosklyar.client.mosaic.domain.MosaicProperty;
 import com.github.rosklyar.client.transaction.domain.ProvisionNamespaceTransaction;
 import com.github.rosklyar.client.transaction.domain.Transaction;
 import com.github.rosklyar.client.transaction.domain.importance.ImportanceTransferTransaction;
-import com.github.rosklyar.client.transaction.domain.mosaic.MosaicDefinitionCreationTransaction;
-import com.github.rosklyar.client.mosaic.domain.Levy;
 import com.github.rosklyar.client.transaction.domain.mosaic.MosaicDefinition;
+import com.github.rosklyar.client.transaction.domain.mosaic.MosaicDefinitionCreationTransaction;
 import com.github.rosklyar.client.transaction.domain.mosaic.MosaicId;
+import com.github.rosklyar.client.transaction.domain.mosaic.MosaicSupplyChangeTransaction;
 
 import java.util.List;
 
@@ -102,6 +103,24 @@ public class ByteArrayTransactionEncoder implements TransactionEncoder {
                 byteSerializer.intToByte(numberOfBytesInAddress),
                 byteSerializer.stringToBytes(transaction.creationFeeSink),
                 byteSerializer.longToByte(transaction.creationFee)
+        );
+    }
+
+    @Override
+    public byte[] data(MosaicSupplyChangeTransaction transaction) {
+        byte[] mosaicIdData = mosaicIdData(transaction.mosaicId);
+        return concat(
+                byteSerializer.intToByte(transaction.type),
+                byteSerializer.intToByte(transaction.version),
+                byteSerializer.intToByte(transaction.timeStamp),
+                byteSerializer.intToByte(numberOfBytesInPublicKey),
+                hexConverter.getBytes(transaction.signer),
+                byteSerializer.longToByte(transaction.fee),
+                byteSerializer.intToByte(transaction.deadline),
+                byteSerializer.intToByte(mosaicIdData.length),
+                mosaicIdData,
+                byteSerializer.intToByte(transaction.supplyType.type),
+                byteSerializer.longToByte(transaction.delta)
         );
     }
 

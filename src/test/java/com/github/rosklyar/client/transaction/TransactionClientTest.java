@@ -6,21 +6,23 @@ import com.github.rosklyar.client.transaction.domain.NemAnnounceResult;
 import com.github.rosklyar.client.transaction.domain.mosaic.MosaicId;
 import com.github.rosklyar.client.transaction.domain.mosaic.MosaicProperties;
 import com.github.rosklyar.client.transaction.domain.mosaic.MosaicTransfer;
+import com.github.rosklyar.client.transaction.domain.mosaic.SupplyType;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static com.netflix.config.ConfigurationManager.getConfigInstance;
 import static com.github.rosklyar.client.DefaultNemClientFactory.TEST;
 import static com.github.rosklyar.client.transaction.domain.importance.Action.ACTIVATE;
 import static com.github.rosklyar.client.transaction.domain.mosaic.LevyType.ABSOLUTE;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.netflix.config.ConfigurationManager.getConfigInstance;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class TransactionClientTest {
 
     private static TransactionClient transactionClient;
+    private static TransactionClient simpleTransactionClient = new DefaultNemClientFactory().simpleTransactionClient("http://153.122.112.137:7890", TEST);
 
     @BeforeAll
     static void init() {
@@ -49,7 +51,7 @@ class TransactionClientTest {
     @Test
     @Disabled
     void makeNemTransfer() {
-        NemAnnounceResult nemAnnounceResult = transactionClient.transferNem(
+        NemAnnounceResult nemAnnounceResult = simpleTransactionClient.transferNem(
                 "fcf0dadc958510dca65651df81aa22c82b2bfe5b29bf8dfb92816bc5f1f11a54",
                 "TD4F657BT4MDBAJXMOZR37MN5T2CRXQW66MPSONE",
                 1000000L,
@@ -221,6 +223,20 @@ class TransactionClientTest {
                 "test mosaic",
                 mosaicProperties,
                 levy,
+                3600
+        );
+
+        assertEquals(1, nemAnnounceResult.code);
+    }
+
+    @Test
+    @Disabled
+    void changeMosaicSupply() {
+        NemAnnounceResult nemAnnounceResult = transactionClient.changeMosaicSupply(
+                "fcf0dadc958510dca65651df81aa22c82b2bfe5b29bf8dfb92816bc5f1f11a54",
+                new MosaicId("library", "somecoin1"),
+                SupplyType.INCREASE,
+                1000000,
                 3600
         );
 

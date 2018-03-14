@@ -29,6 +29,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 class AccountClientTest {
 
     private AccountClient accountClient = new DefaultNemClientFactory().createAccountClient("accountApi");
+    private AccountClient simpleAccountClient = new DefaultNemClientFactory().simpleAccountClient("http://153.122.112.137:7890");
 
     private final String address = "TAVNDWBJFJHZYD3YYWJPDQ345ZAZIYEB2LJXSG65";
     private final String cosignatoryAddress = "TBNDMABIECCN6EQY5WVNJZMCXAUVTN7RKGZH4CP4";
@@ -90,6 +91,8 @@ class AccountClientTest {
     @Test
     void getForwardedAccount() {
         AccountMetaDataPair account = accountClient.getForwarded(address);
+        assertEquals(account, simpleAccountClient.getForwarded(address));
+
         AccountMetaDataPair cosignatoryAccount = accountClient.getFromAddress(cosignatoryAddress);
         AccountMetaDataPair accountFromPublicKey = accountClient.getForwardedFromPublicKey(publicKey);
 
@@ -210,6 +213,7 @@ class AccountClientTest {
     }
 
     @Test
+    @Disabled("test can fail with timeout")
     void getImportances() {
         ImportanceResponse importanceResponse = accountClient.importances();
         assumeTrue(importanceResponse.data.size() > 0);

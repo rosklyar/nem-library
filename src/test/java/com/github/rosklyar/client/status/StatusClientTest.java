@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class StatusClientTest {
 
     private final StatusClient statusClient = new DefaultNemClientFactory().createStatusClient("statusApi");
+    private final StatusClient simpleStatusClient = new DefaultNemClientFactory().simpleStatusClient("http://153.122.112.137:7890");
 
     @BeforeAll
     static void init() {
@@ -28,6 +29,7 @@ class StatusClientTest {
     @Test
     void returnStatusForNode() {
         Status status = new Status(6, 4, "status");
+        assertEquals(status, simpleStatusClient.status());
         assertEquals(status, statusClient.status());
     }
 }

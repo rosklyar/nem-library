@@ -14,6 +14,7 @@ class NodeClientTest {
 
     private static String IP = "153.122.112.137";
     private final NodeClient nodeClient = new DefaultNemClientFactory().createNodeClient("nodeApi");
+    private final NodeClient simpleNodeClient = new DefaultNemClientFactory().simpleNodeClient("http://" + IP + ":7890");
 
     private final String privateKey = "0476fd96242ac5ef6cb1b268887254c1a3089759556beb1ce660c0cb2c42bb27";
 
@@ -35,6 +36,7 @@ class NodeClientTest {
     @Test
     void getPeersList() {
         PeersList peersList = nodeClient.peersList();
+        assertEquals(peersList, simpleNodeClient.peersList());
         assertNotNull(peersList);
     }
 

@@ -19,10 +19,10 @@ import com.github.rosklyar.client.transaction.fee.FeeCalculator;
 import com.github.rosklyar.client.transaction.version.DefaultVersionProvider;
 import com.github.rosklyar.client.transaction.version.Network;
 import com.github.rosklyar.client.transaction.version.VersionProvider;
+import feign.Feign;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import feign.ribbon.RibbonClient;
-
 
 import static feign.hystrix.HystrixFeign.builder;
 import static java.lang.String.format;
@@ -42,12 +42,28 @@ public class DefaultNemClientFactory implements NemClientFactory {
     }
 
     @Override
+    public StatusClient simpleStatusClient(String url) {
+        return Feign.builder()
+                .encoder(new JacksonEncoder())
+                .decoder(new JacksonDecoder())
+                .target(FeignStatusClient.class, url);
+    }
+
+    @Override
     public AccountClient createAccountClient(String configurationPrefix) {
         return builder()
                 .client(RibbonClient.create())
                 .encoder(new JacksonEncoder())
                 .decoder(new JacksonDecoder())
                 .target(FeignAccountClient.class, format("http://%s", configurationPrefix));
+    }
+
+    @Override
+    public AccountClient simpleAccountClient(String url) {
+        return Feign.builder()
+                .encoder(new JacksonEncoder())
+                .decoder(new JacksonDecoder())
+                .target(FeignAccountClient.class, url);
     }
 
     @Override
@@ -60,6 +76,14 @@ public class DefaultNemClientFactory implements NemClientFactory {
     }
 
     @Override
+    public BlockchainClient simpleBlockchainClient(String url) {
+        return Feign.builder()
+                .encoder(new JacksonEncoder())
+                .decoder(new JacksonDecoder())
+                .target(FeignBlockchainClient.class, url);
+    }
+
+    @Override
     public NodeClient createNodeClient(String configurationPrefix) {
         return builder()
                 .client(RibbonClient.create())
@@ -69,12 +93,28 @@ public class DefaultNemClientFactory implements NemClientFactory {
     }
 
     @Override
+    public NodeClient simpleNodeClient(String url) {
+        return Feign.builder()
+                .encoder(new JacksonEncoder())
+                .decoder(new JacksonDecoder())
+                .target(FeignNodeClient.class, url);
+    }
+
+    @Override
     public MosaicClient createMosaicClient(String configurationPrefix) {
         return builder()
                 .client(RibbonClient.create())
                 .encoder(new JacksonEncoder())
                 .decoder(new JacksonDecoder())
                 .target(FeignMosaicClient.class, format("http://%s", configurationPrefix));
+    }
+
+    @Override
+    public MosaicClient simpleMosaicClient(String url) {
+        return Feign.builder()
+                .encoder(new JacksonEncoder())
+                .decoder(new JacksonDecoder())
+                .target(FeignMosaicClient.class, url);
     }
 
     @Override
@@ -94,5 +134,20 @@ public class DefaultNemClientFactory implements NemClientFactory {
         VersionProvider versionProvider = new DefaultVersionProvider();
         FeeCalculator feeCalculator = new DefaultFeeCalculator(mosaicClient, accountClient);
         return new SecureTransactionClient(network, feignTransactionClient, transactionEncoder, hexConverter, versionProvider, feeCalculator, nodeClient);
+    }
+
+    @Override
+    public TransactionClient simpleTransactionClient(String url, Network network) {
+        FeignTransactionClient feignTransactionClient = Feign.builder()
+                .encoder(new JacksonEncoder())
+                .decoder(new JacksonDecoder())
+                .target(FeignTransactionClient.class, url);
+
+        HexConverter hexConverter = new DefaultHexConverter();
+        ByteSerializer byteSerializer = new DefaultByteSerializer(hexConverter);
+        TransactionEncoder transactionEncoder = new ByteArrayTransactionEncoder(byteSerializer, hexConverter);
+        VersionProvider versionProvider = new DefaultVersionProvider();
+        FeeCalculator feeCalculator = new DefaultFeeCalculator(simpleMosaicClient(url), simpleAccountClient(url));
+        return new SecureTransactionClient(network, feignTransactionClient, transactionEncoder, hexConverter, versionProvider, feeCalculator, simpleNodeClient(url));
     }
 }

@@ -6,6 +6,7 @@ import com.github.rosklyar.client.transaction.domain.importance.Action;
 import com.github.rosklyar.client.transaction.domain.mosaic.MosaicId;
 import com.github.rosklyar.client.transaction.domain.mosaic.MosaicProperties;
 import com.github.rosklyar.client.transaction.domain.mosaic.MosaicTransfer;
+import com.github.rosklyar.client.transaction.domain.mosaic.SupplyType;
 
 import java.util.List;
 
@@ -32,5 +33,7 @@ public interface TransactionClient {
     NemAnnounceResult importanceTransfer(String privateKey, Action action, String remoteAccountPublicKey, int timeToLiveInSeconds);
 
     NemAnnounceResult createMosaic(String privateKey, MosaicId mosaicId, String mosaicDescription, MosaicProperties mosaicProperties, Levy levy, int timeToLiveInSeconds);
+
+    NemAnnounceResult changeMosaicSupply(String privateKey, MosaicId mosaicId, SupplyType supplyType, long amount, int timeToLiveInSeconds);
 
 }

@@ -4,6 +4,7 @@ import com.github.rosklyar.client.transaction.domain.ProvisionNamespaceTransacti
 import com.github.rosklyar.client.transaction.domain.Transaction;
 import com.github.rosklyar.client.transaction.domain.importance.ImportanceTransferTransaction;
 import com.github.rosklyar.client.transaction.domain.mosaic.MosaicDefinitionCreationTransaction;
+import com.github.rosklyar.client.transaction.domain.mosaic.MosaicSupplyChangeTransaction;
 
 public interface TransactionEncoder {
     byte[] data(Transaction transaction);
@@ -13,4 +14,6 @@ public interface TransactionEncoder {
     byte[] data(ImportanceTransferTransaction transaction);
 
     byte[] data(MosaicDefinitionCreationTransaction mosaicDefinitionCreationTransaction);
+
+    byte[] data(MosaicSupplyChangeTransaction transaction);
 }

@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class MosaicClientTest {
 
     private final MosaicClient mosaicClient = new DefaultNemClientFactory().createMosaicClient("mosaicApi");
+    private final MosaicClient simpleMosaicClient = new DefaultNemClientFactory().simpleMosaicClient("http://153.122.112.137:7890");
 
     @BeforeAll
     static void init() {
@@ -34,6 +35,7 @@ class MosaicClientTest {
     @Test
     void getMosaics() {
         MosaicsMetaDataResponse nemMosaics = mosaicClient.mosaics("evias", null, null);
+        assertEquals(nemMosaics, simpleMosaicClient.mosaics("evias", null, null));
         assertTrue(nemMosaics.data.size() > 0);
     }
 
