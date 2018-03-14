@@ -1,5 +1,6 @@
 package com.github.rosklyar.client.transaction.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.github.rosklyar.client.account.domain.Hash;
@@ -34,6 +35,7 @@ public class Transaction {
     public final RelativeChange minCosignatories;
     public final Transaction otherTrans;
     public final List<Signature> signatures;
+    @JsonIgnore
     public final List<MosaicTransfer> mosaics;
     public final String otherAccount;
     public final Hash otherHash;
