@@ -6,15 +6,6 @@ Uses:
 - ribbon(https://github.com/Netflix/ribbon) to implement load balancing
 - archaius(https://github.com/Netflix/archaius) to configure library
 
-<h2>Install</h2>
-Just install library to local maven storage. I'm going to add it to maven central in a few days.
-
-```bash
-git clone https://github.com/rosklyar/nem-library.git
-cd nem-library
-mvn clean install
-```
-
 <h2>Usage</h2>
 <h3>1. Import library as maven dependency</h3>
 
@@ -22,7 +13,7 @@ mvn clean install
 <dependency>
     <groupId>com.github.rosklyar</groupId>
     <artifactId>nem-library</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
 </dependency>
 ```
 
