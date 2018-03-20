@@ -9,6 +9,7 @@ import com.github.rosklyar.client.transaction.domain.mosaic.MosaicDefinition;
 import com.github.rosklyar.client.transaction.domain.mosaic.MosaicDefinitionCreationTransaction;
 import com.github.rosklyar.client.transaction.domain.mosaic.MosaicId;
 import com.github.rosklyar.client.transaction.domain.mosaic.MosaicSupplyChangeTransaction;
+import com.github.rosklyar.client.transaction.domain.multisig.MultisigTransaction;
 
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class ByteArrayTransactionEncoder implements TransactionEncoder {
 
     @Override
     public byte[] data(Transaction transaction) {
-        byte[] commonTransactionPart = commonTransactionPart(transaction);
+        byte[] commonTransactionPart = commonTransactionPart(transaction.type, transaction.version, transaction.timeStamp, transaction.signer, transaction.fee, transaction.deadline);
         byte[] transferPart = getTransferPartData(transaction);
         byte[] mosaicsPart = getAllMosaicsBytes(transaction);
         byte[] multisigAggregateModificationPart = getAggregateModificationPart(transaction);
@@ -53,6 +54,9 @@ public class ByteArrayTransactionEncoder implements TransactionEncoder {
 
     @Override
     public byte[] data(ProvisionNamespaceTransaction transaction) {
+        if (transaction == null) {
+            return new byte[0];
+        }
         byte[] parentNamespacePart = isNullOrEmpty(transaction.parent) ?
                 byteSerializer.intToByte(nullBytesSentinelValue) :
                 concat(
@@ -61,7 +65,7 @@ public class ByteArrayTransactionEncoder implements TransactionEncoder {
                 );
 
         return concat(
-                commonTransactionPart(transaction),
+                commonTransactionPart(transaction.type, transaction.version, transaction.timeStamp, transaction.signer, transaction.fee, transaction.deadline),
                 byteSerializer.intToByte(numberOfBytesInAddress),
                 byteSerializer.stringToBytes(transaction.rentalFeeSink),
                 byteSerializer.longToByte(transaction.rentalFee),
@@ -74,13 +78,7 @@ public class ByteArrayTransactionEncoder implements TransactionEncoder {
     @Override
     public byte[] data(ImportanceTransferTransaction transaction) {
         return concat(
-                byteSerializer.intToByte(transaction.type),
-                byteSerializer.intToByte(transaction.version),
-                byteSerializer.intToByte(transaction.timeStamp),
-                byteSerializer.intToByte(numberOfBytesInPublicKey),
-                hexConverter.getBytes(transaction.signer),
-                byteSerializer.longToByte(transaction.fee),
-                byteSerializer.intToByte(transaction.deadline),
+                commonTransactionPart(transaction.type, transaction.version, transaction.timeStamp, transaction.signer, transaction.fee, transaction.deadline),
                 byteSerializer.intToByte(transaction.action.mode),
                 byteSerializer.intToByte(numberOfBytesInPublicKey),
                 hexConverter.getBytes(transaction.remoteAccount)
@@ -91,13 +89,7 @@ public class ByteArrayTransactionEncoder implements TransactionEncoder {
     public byte[] data(MosaicDefinitionCreationTransaction transaction) {
         byte[] mosaicDefinitionData = mosaicDefinitionData(transaction.mosaicDefinition);
         return concat(
-                byteSerializer.intToByte(transaction.type),
-                byteSerializer.intToByte(transaction.version),
-                byteSerializer.intToByte(transaction.timeStamp),
-                byteSerializer.intToByte(numberOfBytesInPublicKey),
-                hexConverter.getBytes(transaction.signer),
-                byteSerializer.longToByte(transaction.fee),
-                byteSerializer.intToByte(transaction.deadline),
+                commonTransactionPart(transaction.type, transaction.version, transaction.timeStamp, transaction.signer, transaction.fee, transaction.deadline),
                 byteSerializer.intToByte(mosaicDefinitionData.length),
                 mosaicDefinitionData,
                 byteSerializer.intToByte(numberOfBytesInAddress),
@@ -110,17 +102,39 @@ public class ByteArrayTransactionEncoder implements TransactionEncoder {
     public byte[] data(MosaicSupplyChangeTransaction transaction) {
         byte[] mosaicIdData = mosaicIdData(transaction.mosaicId);
         return concat(
-                byteSerializer.intToByte(transaction.type),
-                byteSerializer.intToByte(transaction.version),
-                byteSerializer.intToByte(transaction.timeStamp),
-                byteSerializer.intToByte(numberOfBytesInPublicKey),
-                hexConverter.getBytes(transaction.signer),
-                byteSerializer.longToByte(transaction.fee),
-                byteSerializer.intToByte(transaction.deadline),
+                commonTransactionPart(transaction.type, transaction.version, transaction.timeStamp, transaction.signer, transaction.fee, transaction.deadline),
                 byteSerializer.intToByte(mosaicIdData.length),
                 mosaicIdData,
                 byteSerializer.intToByte(transaction.supplyType.type),
                 byteSerializer.longToByte(transaction.delta)
+        );
+    }
+
+    @Override
+    public byte[] dataMultisigTransfer(MultisigTransaction<Transaction> transaction) {
+        return concat(
+                commonTransactionPart(transaction.type, transaction.version, transaction.timeStamp, transaction.signer, transaction.fee, transaction.deadline),
+                otherTransactionPart(transaction.otherTrans)
+        );
+    }
+
+    @Override
+    public byte[] dataMultisigProvisionNamespace(MultisigTransaction<ProvisionNamespaceTransaction> transaction) {
+        byte[] data = data(transaction.otherTrans);
+        return concat(
+                commonTransactionPart(transaction.type, transaction.version, transaction.timeStamp, transaction.signer, transaction.fee, transaction.deadline),
+                byteSerializer.intToByte(data.length),
+                data
+        );
+    }
+
+    @Override
+    public byte[] dataMultisigMosaicCreation(MultisigTransaction<MosaicDefinitionCreationTransaction> transaction) {
+        byte[] data = data(transaction.otherTrans);
+        return concat(
+                commonTransactionPart(transaction.type, transaction.version, transaction.timeStamp, transaction.signer, transaction.fee, transaction.deadline),
+                byteSerializer.intToByte(data.length),
+                data
         );
     }
 
@@ -196,26 +210,15 @@ public class ByteArrayTransactionEncoder implements TransactionEncoder {
         );
     }
 
-    private byte[] commonTransactionPart(Transaction transaction) {
+    private byte[] commonTransactionPart(int type, int version, int timeStamp, String signer, long fee, int deadline) {
         return concat(
-                byteSerializer.intToByte(transaction.type),
-                byteSerializer.intToByte(transaction.version),
-                byteSerializer.intToByte(transaction.timeStamp),
+                byteSerializer.intToByte(type),
+                byteSerializer.intToByte(version),
+                byteSerializer.intToByte(timeStamp),
                 byteSerializer.intToByte(numberOfBytesInPublicKey),
-                hexConverter.getBytes(transaction.signer),
-                byteSerializer.longToByte(transaction.fee),
-                byteSerializer.intToByte(transaction.deadline));
-    }
-
-    private byte[] commonTransactionPart(ProvisionNamespaceTransaction transaction) {
-        return concat(
-                byteSerializer.intToByte(transaction.type),
-                byteSerializer.intToByte(transaction.version),
-                byteSerializer.intToByte(transaction.timeStamp),
-                byteSerializer.intToByte(numberOfBytesInPublicKey),
-                hexConverter.getBytes(transaction.signer),
-                byteSerializer.longToByte(transaction.fee),
-                byteSerializer.intToByte(transaction.deadline));
+                hexConverter.getBytes(signer),
+                byteSerializer.longToByte(fee),
+                byteSerializer.intToByte(deadline));
     }
 
     private byte[] otherTransactionPart(Transaction transaction) {

@@ -1,5 +1,7 @@
 package com.github.rosklyar.client.transaction;
 
+import com.github.rosklyar.client.account.domain.Hash;
+import com.github.rosklyar.client.account.domain.Message;
 import com.github.rosklyar.client.mosaic.domain.Levy;
 import com.github.rosklyar.client.mosaic.domain.MosaicProperty;
 import com.github.rosklyar.client.node.NodeClient;
@@ -11,6 +13,7 @@ import com.github.rosklyar.client.transaction.domain.importance.Action;
 import com.github.rosklyar.client.transaction.domain.importance.ImportanceTransferTransaction;
 import com.github.rosklyar.client.transaction.domain.mosaic.*;
 import com.github.rosklyar.client.transaction.domain.multisig.Modification;
+import com.github.rosklyar.client.transaction.domain.multisig.MultisigTransaction;
 import com.github.rosklyar.client.transaction.domain.multisig.RelativeChange;
 import com.github.rosklyar.client.transaction.encode.DefaultSigner;
 import com.github.rosklyar.client.transaction.encode.HexConverter;
@@ -19,9 +22,6 @@ import com.github.rosklyar.client.transaction.encode.TransactionEncoder;
 import com.github.rosklyar.client.transaction.fee.FeeCalculator;
 import com.github.rosklyar.client.transaction.version.Network;
 import com.github.rosklyar.client.transaction.version.VersionProvider;
-import com.github.rosklyar.client.account.domain.Hash;
-import com.github.rosklyar.client.account.domain.Message;
-
 
 import java.util.List;
 
@@ -125,7 +125,7 @@ public class SecureTransactionClient implements TransactionClient {
         int currentTime = nodeClient.extendedInfo().nisInfo.currentTime;
 
         Transaction transferTransaction = transferNemTransaction(multisigPublicKey, toAddress, microXemAmount, message, currentTime, timeToLiveInSeconds);
-        Transaction transaction = Transaction.builder()
+        MultisigTransaction<Transaction> transaction = MultisigTransaction.<Transaction>builder()
                 .type(MULTISIG_TRANSACTION.type)
                 .version(versionProvider.version(network, MULTISIG_TRANSACTION))
                 .timeStamp(currentTime)
@@ -135,7 +135,7 @@ public class SecureTransactionClient implements TransactionClient {
                 .otherTrans(transferTransaction)
                 .build();
 
-        byte[] data = transactionEncoder.data(transaction);
+        byte[] data = transactionEncoder.dataMultisigTransfer(transaction);
 
         return feignTransactionClient.prepare(new RequestAnnounce(hexConverter.getString(data), signer.sign(data)));
     }
@@ -147,7 +147,7 @@ public class SecureTransactionClient implements TransactionClient {
         int currentTime = nodeClient.extendedInfo().nisInfo.currentTime;
 
         Transaction transferTransaction = mosaicsTransferTransaction(multisigPublicKey, toAddress, mosaics, times, message, currentTime, timeToLiveInSeconds);
-        Transaction transaction = Transaction.builder()
+        MultisigTransaction<Transaction> transaction = MultisigTransaction.<Transaction>builder()
                 .type(MULTISIG_TRANSACTION.type)
                 .version(versionProvider.version(network, MULTISIG_TRANSACTION))
                 .timeStamp(currentTime)
@@ -157,7 +157,51 @@ public class SecureTransactionClient implements TransactionClient {
                 .otherTrans(transferTransaction)
                 .build();
 
-        byte[] data = transactionEncoder.data(transaction);
+        byte[] data = transactionEncoder.dataMultisigTransfer(transaction);
+
+        return feignTransactionClient.prepare(new RequestAnnounce(hexConverter.getString(data), signer.sign(data)));
+    }
+
+    @Override
+    public NemAnnounceResult multisigCreateNamespace(String privateKey, String parentNamespace, String namespace, String multisigPublicKey, int timeToLiveInSeconds) {
+        Signer signer = new DefaultSigner(privateKey);
+        int currentTime = nodeClient.extendedInfo().nisInfo.currentTime;
+
+        ProvisionNamespaceTransaction provisionNamespaceTransaction = provisionNamespaceTransaction(multisigPublicKey, parentNamespace, namespace, currentTime, timeToLiveInSeconds);
+
+        MultisigTransaction<ProvisionNamespaceTransaction> transaction = MultisigTransaction.<ProvisionNamespaceTransaction>builder()
+                .type(MULTISIG_TRANSACTION.type)
+                .version(versionProvider.version(network, MULTISIG_TRANSACTION))
+                .timeStamp(currentTime)
+                .signer(signer.publicKey())
+                .fee(feeCalculator.multisigTransactionFee())
+                .deadline(currentTime + timeToLiveInSeconds)
+                .otherTrans(provisionNamespaceTransaction)
+                .build();
+
+        byte[] data = transactionEncoder.dataMultisigProvisionNamespace(transaction);
+
+        return feignTransactionClient.prepare(new RequestAnnounce(hexConverter.getString(data), signer.sign(data)));
+    }
+
+    @Override
+    public NemAnnounceResult multisigCreateMosaic(String privateKey, MosaicId mosaicId, String mosaicDescription, MosaicProperties mosaicProperties, Levy levy, String multisigPublicKey, int timeToLiveInSeconds) {
+        Signer signer = new DefaultSigner(privateKey);
+        int currentTime = nodeClient.extendedInfo().nisInfo.currentTime;
+
+        MosaicDefinitionCreationTransaction mosaicDefinitionCreationTransaction = mosaicDefinitionCreationTransaction(mosaicId, mosaicDescription, mosaicProperties, levy, multisigPublicKey, currentTime, timeToLiveInSeconds);
+
+        MultisigTransaction<MosaicDefinitionCreationTransaction> transaction = MultisigTransaction.<MosaicDefinitionCreationTransaction>builder()
+                .type(MULTISIG_TRANSACTION.type)
+                .version(versionProvider.version(network, MULTISIG_TRANSACTION))
+                .timeStamp(currentTime)
+                .signer(signer.publicKey())
+                .fee(feeCalculator.multisigTransactionFee())
+                .deadline(currentTime + timeToLiveInSeconds)
+                .otherTrans(mosaicDefinitionCreationTransaction)
+                .build();
+
+        byte[] data = transactionEncoder.dataMultisigMosaicCreation(transaction);
 
         return feignTransactionClient.prepare(new RequestAnnounce(hexConverter.getString(data), signer.sign(data)));
     }
@@ -188,18 +232,7 @@ public class SecureTransactionClient implements TransactionClient {
         Signer signer = new DefaultSigner(privateKey);
         int currentTime = nodeClient.extendedInfo().nisInfo.currentTime;
 
-        ProvisionNamespaceTransaction transaction = ProvisionNamespaceTransaction.builder()
-                .type(PROVISION_NAMESPACE.type)
-                .version(versionProvider.version(network, PROVISION_NAMESPACE))
-                .timeStamp(currentTime)
-                .signer(signer.publicKey())
-                .fee(feeCalculator.namespaceProvisionFee())
-                .deadline(currentTime + timeToLiveInSeconds)
-                .rentalFeeSink(network.rentalFeeSink)
-                .rentalFee(feeCalculator.rentalFee(parentNamespace, namespace))
-                .parent(parentNamespace)
-                .newPart(namespace)
-                .build();
+        ProvisionNamespaceTransaction transaction = provisionNamespaceTransaction(signer.publicKey(), parentNamespace, namespace, currentTime, timeToLiveInSeconds);
 
         byte[] data = transactionEncoder.data(transaction);
 
@@ -233,30 +266,7 @@ public class SecureTransactionClient implements TransactionClient {
         int currentTime = nodeClient.extendedInfo().nisInfo.currentTime;
         String publicKey = signer.publicKey();
 
-        MosaicDefinition mosaicDefinition = MosaicDefinition.builder()
-                .creator(publicKey)
-                .id(mosaicId)
-                .description(mosaicDescription)
-                .levy(levy)
-                .properties(newArrayList(
-                        new MosaicProperty("divisibility", String.valueOf(mosaicProperties.divisibility)),
-                        new MosaicProperty("initialSupply", String.valueOf(mosaicProperties.initialSupply)),
-                        new MosaicProperty("supplyMutable", String.valueOf(mosaicProperties.supplyMutable)),
-                        new MosaicProperty("transferable", String.valueOf(mosaicProperties.transferable))
-                ))
-                .build();
-
-        MosaicDefinitionCreationTransaction mosaicDefinitionCreationTransaction = MosaicDefinitionCreationTransaction.builder()
-                .type(MOSAIC_DEFINITION_CREATION.type)
-                .version(versionProvider.version(network, MOSAIC_DEFINITION_CREATION))
-                .timeStamp(currentTime)
-                .signer(publicKey)
-                .fee(feeCalculator.mosaicCreationFee())
-                .deadline(currentTime + timeToLiveInSeconds)
-                .creationFee(feeCalculator.mosaicRentalFee())
-                .creationFeeSink(network.creationFeeSink)
-                .mosaicDefinition(mosaicDefinition)
-                .build();
+        MosaicDefinitionCreationTransaction mosaicDefinitionCreationTransaction = mosaicDefinitionCreationTransaction(mosaicId, mosaicDescription, mosaicProperties, levy, publicKey, currentTime, timeToLiveInSeconds);
 
         byte[] data = transactionEncoder.data(mosaicDefinitionCreationTransaction);
 
@@ -296,6 +306,48 @@ public class SecureTransactionClient implements TransactionClient {
                 .recipient(toAddress)
                 .amount(microXemAmount)
                 .message(new Message(message, 1))
+                .build();
+    }
+
+    private MosaicDefinitionCreationTransaction mosaicDefinitionCreationTransaction(MosaicId mosaicId, String mosaicDescription, MosaicProperties mosaicProperties, Levy levy, String publicKey, int currentTime, int timeToLiveInSeconds) {
+        MosaicDefinition mosaicDefinition = MosaicDefinition.builder()
+                .creator(publicKey)
+                .id(mosaicId)
+                .description(mosaicDescription)
+                .levy(levy)
+                .properties(newArrayList(
+                        new MosaicProperty("divisibility", String.valueOf(mosaicProperties.divisibility)),
+                        new MosaicProperty("initialSupply", String.valueOf(mosaicProperties.initialSupply)),
+                        new MosaicProperty("supplyMutable", String.valueOf(mosaicProperties.supplyMutable)),
+                        new MosaicProperty("transferable", String.valueOf(mosaicProperties.transferable))
+                ))
+                .build();
+
+        return MosaicDefinitionCreationTransaction.builder()
+                .type(MOSAIC_DEFINITION_CREATION.type)
+                .version(versionProvider.version(network, MOSAIC_DEFINITION_CREATION))
+                .timeStamp(currentTime)
+                .signer(publicKey)
+                .fee(feeCalculator.mosaicCreationFee())
+                .deadline(currentTime + timeToLiveInSeconds)
+                .creationFee(feeCalculator.mosaicRentalFee())
+                .creationFeeSink(network.creationFeeSink)
+                .mosaicDefinition(mosaicDefinition)
+                .build();
+    }
+
+    private ProvisionNamespaceTransaction provisionNamespaceTransaction(String publicKey, String parentNamespace, String namespace, int currentTime, int timeToLiveInSeconds) {
+        return ProvisionNamespaceTransaction.builder()
+                .type(PROVISION_NAMESPACE.type)
+                .version(versionProvider.version(network, PROVISION_NAMESPACE))
+                .timeStamp(currentTime)
+                .signer(publicKey)
+                .fee(feeCalculator.namespaceProvisionFee())
+                .deadline(currentTime + timeToLiveInSeconds)
+                .rentalFeeSink(network.rentalFeeSink)
+                .rentalFee(feeCalculator.rentalFee(parentNamespace, namespace))
+                .parent(parentNamespace)
+                .newPart(namespace)
                 .build();
     }
 
