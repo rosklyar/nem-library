@@ -19,6 +19,7 @@ import static com.netflix.config.ConfigurationManager.getConfigInstance;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+@Disabled
 class TransactionClientTest {
 
     private static TransactionClient transactionClient;
@@ -49,7 +50,6 @@ class TransactionClientTest {
     }
 
     @Test
-    @Disabled
     void makeNemTransfer() {
         NemAnnounceResult nemAnnounceResult = simpleTransactionClient.transferNem(
                 "fcf0dadc958510dca65651df81aa22c82b2bfe5b29bf8dfb92816bc5f1f11a54",
@@ -62,7 +62,6 @@ class TransactionClientTest {
     }
 
     @Test
-    @Disabled
     void makeMosaicTransfer() {
         MosaicTransfer mosaicTransfer = MosaicTransfer.builder()
                 .mosaicId(new MosaicId("library", "testcoin"))
@@ -79,7 +78,6 @@ class TransactionClientTest {
     }
 
     @Test
-    @Disabled
     void createMultisigAccount() {
         NemAnnounceResult nemAnnounceResult = transactionClient.createMultisigAccount(
                 "1ff5c6eaabedc8c95510635cabf75837e72da536127742f32873a7cc096ca74b",
@@ -93,7 +91,6 @@ class TransactionClientTest {
     }
 
     @Test
-    @Disabled
     void multisigNemTransfer() {
         NemAnnounceResult nemAnnounceResult = transactionClient.multisigTransferNem(
                 "2ee2a08ad2ebc1371330c9977d15e52f482aa514554e085bec5ed076e8b11581",
@@ -107,7 +104,6 @@ class TransactionClientTest {
     }
 
     @Test
-    @Disabled
     void multisigMosaicTransfer() {
         MosaicTransfer mosaicTransfer = MosaicTransfer.builder()
                 .mosaicId(new MosaicId("library", "testcoin"))
@@ -123,7 +119,6 @@ class TransactionClientTest {
     }
 
     @Test
-    @Disabled
     void multisigCreateNamespace() {
         NemAnnounceResult nemAnnounceResult = transactionClient.multisigCreateNamespace(
                 "2ee2a08ad2ebc1371330c9977d15e52f482aa514554e085bec5ed076e8b11581",
@@ -140,7 +135,6 @@ class TransactionClientTest {
     }
 
     @Test
-    @Disabled
     void multisigCreateMosaic() {
 
         MosaicProperties mosaicProperties = MosaicProperties.builder()
@@ -168,7 +162,6 @@ class TransactionClientTest {
     }
 
     @Test
-    @Disabled
     void namespaceProvision() {
         NemAnnounceResult nemAnnounceResult = transactionClient.createNamespace(
                 "fcf0dadc958510dca65651df81aa22c82b2bfe5b29bf8dfb92816bc5f1f11a54",
@@ -188,7 +181,6 @@ class TransactionClientTest {
     }
 
     @Test
-    @Disabled
     void addCosignatoryToMultisigAccount() {
         NemAnnounceResult nemAnnounceResult = transactionClient.addCosignatoriesToMultisigAccount(
                 "2ee2a08ad2ebc1371330c9977d15e52f482aa514554e085bec5ed076e8b11581",
@@ -211,7 +203,6 @@ class TransactionClientTest {
     }
 
     @Test
-    @Disabled
     void removeCosignatoryFromMultisigAccount() {
         NemAnnounceResult nemAnnounceResult = transactionClient.removeCosignatoriesFromMultisigAccount(
                 "2ee2a08ad2ebc1371330c9977d15e52f482aa514554e085bec5ed076e8b11581",
@@ -234,7 +225,6 @@ class TransactionClientTest {
     }
 
     @Test
-    @Disabled
     void importanceTransfer() {
         NemAnnounceResult nemAnnounceResult = transactionClient.importanceTransfer(
                 "fcf0dadc958510dca65651df81aa22c82b2bfe5b29bf8dfb92816bc5f1f11a54",
@@ -246,7 +236,6 @@ class TransactionClientTest {
     }
 
     @Test
-    @Disabled
     void createMosaic() {
         Levy levy = Levy.builder()
                 .fee(1000)
@@ -275,7 +264,6 @@ class TransactionClientTest {
     }
 
     @Test
-    @Disabled
     void changeMosaicSupply() {
         NemAnnounceResult nemAnnounceResult = transactionClient.changeMosaicSupply(
                 "fcf0dadc958510dca65651df81aa22c82b2bfe5b29bf8dfb92816bc5f1f11a54",

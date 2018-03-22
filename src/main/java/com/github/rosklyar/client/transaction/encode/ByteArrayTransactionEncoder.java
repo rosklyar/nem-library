@@ -241,7 +241,7 @@ public class ByteArrayTransactionEncoder implements TransactionEncoder {
         return concat(
                 modificationsData,
                 byteSerializer.intToByte(lengthOfMinCosignatoriesStructure),
-                byteSerializer.intToByte(transaction.minCosignatories.relativeChange)
+                transaction.minCosignatories == null ? byteSerializer.intToByte(0) : byteSerializer.intToByte(transaction.minCosignatories.relativeChange)
         );
     }
 
