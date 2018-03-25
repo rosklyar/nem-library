@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 
 import static com.github.rosklyar.client.DefaultNemClientFactory.TEST;
 import static com.github.rosklyar.client.transaction.domain.importance.Action.ACTIVATE;
-import static com.github.rosklyar.client.transaction.domain.importance.Action.DEACTIVATE;
 import static com.github.rosklyar.client.transaction.domain.mosaic.LevyType.ABSOLUTE;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.netflix.config.ConfigurationManager.getConfigInstance;
