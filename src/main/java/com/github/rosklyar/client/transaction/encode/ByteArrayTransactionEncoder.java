@@ -138,6 +138,26 @@ public class ByteArrayTransactionEncoder implements TransactionEncoder {
         );
     }
 
+    @Override
+    public byte[] dataMultisigMosaicSupplyChange(MultisigTransaction<MosaicSupplyChangeTransaction> transaction) {
+        byte[] data = data(transaction.otherTrans);
+        return concat(
+                commonTransactionPart(transaction.type, transaction.version, transaction.timeStamp, transaction.signer, transaction.fee, transaction.deadline),
+                byteSerializer.intToByte(data.length),
+                data
+        );
+    }
+
+    @Override
+    public byte[] dataMultisigImportanceTransfer(MultisigTransaction<ImportanceTransferTransaction> transaction) {
+        byte[] data = data(transaction.otherTrans);
+        return concat(
+                commonTransactionPart(transaction.type, transaction.version, transaction.timeStamp, transaction.signer, transaction.fee, transaction.deadline),
+                byteSerializer.intToByte(data.length),
+                data
+        );
+    }
+
     private byte[] mosaicDefinitionData(MosaicDefinition mosaicDefinition) {
         byte[] mosaicIdData = mosaicIdData(mosaicDefinition.id);
         byte[] levyData = levyData(mosaicDefinition.levy);

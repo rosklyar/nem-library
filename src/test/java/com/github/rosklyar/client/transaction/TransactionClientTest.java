@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import static com.github.rosklyar.client.DefaultNemClientFactory.TEST;
 import static com.github.rosklyar.client.transaction.domain.importance.Action.ACTIVATE;
+import static com.github.rosklyar.client.transaction.domain.importance.Action.DEACTIVATE;
 import static com.github.rosklyar.client.transaction.domain.mosaic.LevyType.ABSOLUTE;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.netflix.config.ConfigurationManager.getConfigInstance;
@@ -159,6 +160,35 @@ class TransactionClientTest {
 
         NemAnnounceResult cosignNemAnnounceResult = transactionClient.cosignTransaction("fcf0dadc958510dca65651df81aa22c82b2bfe5b29bf8dfb92816bc5f1f11a54", nemAnnounceResult.innerTransactionHash.data, "TD4F657BT4MDBAJXMOZR37MN5T2CRXQW66MPSONE", 3600);
         assertEquals(1, cosignNemAnnounceResult.code);
+    }
+
+    @Test
+    void multisigChangeMosaicSupply() {
+        NemAnnounceResult nemAnnounceResult = transactionClient.multisigChangeMosaicSupply(
+                "2ee2a08ad2ebc1371330c9977d15e52f482aa514554e085bec5ed076e8b11581",
+                new MosaicId("testm", "testmult"),
+                SupplyType.INCREASE,
+                1000000,
+                "d9728f3002d6292d54aa2e5c75f1e72bb7f7b800645c46e91171935285e77747",
+                3600
+        );
+
+        assertEquals(1, nemAnnounceResult.code);
+
+        NemAnnounceResult cosignNemAnnounceResult = transactionClient.cosignTransaction("fcf0dadc958510dca65651df81aa22c82b2bfe5b29bf8dfb92816bc5f1f11a54", nemAnnounceResult.innerTransactionHash.data, "TD4F657BT4MDBAJXMOZR37MN5T2CRXQW66MPSONE", 3600);
+        assertEquals(1, cosignNemAnnounceResult.code);
+    }
+
+    @Test
+    void multisigImportanceTransfer() {
+        NemAnnounceResult nemAnnounceResult = transactionClient.multisigImportanceTransfer(
+                "2ee2a08ad2ebc1371330c9977d15e52f482aa514554e085bec5ed076e8b11581",
+                ACTIVATE,
+                "82bfa081e42631c0edc1f16b7a5b0534a5b2e4b88cbce709c623a70192e93b7a",
+                "d9728f3002d6292d54aa2e5c75f1e72bb7f7b800645c46e91171935285e77747",
+                3600
+        );
+        assertEquals(1, nemAnnounceResult.code);
     }
 
     @Test

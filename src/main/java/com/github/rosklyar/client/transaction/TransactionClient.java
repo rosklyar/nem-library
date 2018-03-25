@@ -30,6 +30,10 @@ public interface TransactionClient {
 
     NemAnnounceResult multisigCreateMosaic(String privateKey, MosaicId mosaicId, String mosaicDescription, MosaicProperties mosaicProperties, Levy levy, String multisigPublicKey, int timeToLiveInSeconds);
 
+    NemAnnounceResult multisigChangeMosaicSupply(String privateKey, MosaicId mosaicId, SupplyType supplyType, long amount, String multisigPublicKey, int timeToLiveInSeconds);
+
+    NemAnnounceResult multisigImportanceTransfer(String privateKey, Action action, String remoteAccountPublicKey, String multisigPublicKey, int timeToLiveInSeconds);
+
     NemAnnounceResult cosignTransaction(String privateKey, String transactionHash, String multisigAddress, int timeToLiveInSeconds);
 
     NemAnnounceResult createNamespace(String privateKey, String parentNamespace, String namespace, int timeToLiveInSeconds);

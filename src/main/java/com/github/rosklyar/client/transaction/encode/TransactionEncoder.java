@@ -23,4 +23,8 @@ public interface TransactionEncoder {
     byte[] dataMultisigProvisionNamespace(MultisigTransaction<ProvisionNamespaceTransaction> transaction);
 
     byte[] dataMultisigMosaicCreation(MultisigTransaction<MosaicDefinitionCreationTransaction> transaction);
+
+    byte[] dataMultisigMosaicSupplyChange(MultisigTransaction<MosaicSupplyChangeTransaction> transaction);
+
+    byte[] dataMultisigImportanceTransfer(MultisigTransaction<ImportanceTransferTransaction> transaction);
 }

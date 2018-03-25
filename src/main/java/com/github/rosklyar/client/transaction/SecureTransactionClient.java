@@ -207,6 +207,52 @@ public class SecureTransactionClient implements TransactionClient {
     }
 
     @Override
+    public NemAnnounceResult multisigChangeMosaicSupply(String privateKey, MosaicId mosaicId, SupplyType supplyType, long amount, String multisigPublicKey, int timeToLiveInSeconds) {
+        Signer signer = new DefaultSigner(privateKey);
+        int currentTime = nodeClient.extendedInfo().nisInfo.currentTime;
+
+        MosaicSupplyChangeTransaction supplyChangeTransaction = mosaicSupplyChangeTransaction(mosaicId, supplyType, amount, multisigPublicKey, currentTime, timeToLiveInSeconds);
+
+        MultisigTransaction<MosaicSupplyChangeTransaction> transaction = MultisigTransaction.<MosaicSupplyChangeTransaction>builder()
+                .type(MULTISIG_TRANSACTION.type)
+                .version(versionProvider.version(network, MULTISIG_TRANSACTION))
+                .timeStamp(currentTime)
+                .signer(signer.publicKey())
+                .fee(feeCalculator.multisigTransactionFee())
+                .deadline(currentTime + timeToLiveInSeconds)
+                .otherTrans(supplyChangeTransaction)
+                .build();
+
+        byte[] data = transactionEncoder.dataMultisigMosaicSupplyChange(transaction);
+
+        return feignTransactionClient.prepare(new RequestAnnounce(hexConverter.getString(data), signer.sign(data)));
+    }
+
+    @Override
+    public NemAnnounceResult multisigImportanceTransfer(String privateKey, Action action, String remoteAccountPublicKey, String multisigPublicKey, int timeToLiveInSeconds) {
+
+        Signer signer = new DefaultSigner(privateKey);
+        int currentTime = nodeClient.extendedInfo().nisInfo.currentTime;
+        String publicKey = signer.publicKey();
+
+        ImportanceTransferTransaction importanceTransferTransaction = importanceTransferTransaction(action, remoteAccountPublicKey, timeToLiveInSeconds, currentTime, publicKey);
+
+        MultisigTransaction<ImportanceTransferTransaction> transaction = MultisigTransaction.<ImportanceTransferTransaction>builder()
+                .type(MULTISIG_TRANSACTION.type)
+                .version(versionProvider.version(network, MULTISIG_TRANSACTION))
+                .timeStamp(currentTime)
+                .signer(signer.publicKey())
+                .fee(feeCalculator.multisigTransactionFee())
+                .deadline(currentTime + timeToLiveInSeconds)
+                .otherTrans(importanceTransferTransaction)
+                .build();
+
+        byte[] data = transactionEncoder.dataMultisigImportanceTransfer(transaction);
+
+        return feignTransactionClient.prepare(new RequestAnnounce(hexConverter.getString(data), signer.sign(data)));
+    }
+
+    @Override
     public NemAnnounceResult cosignTransaction(String privateKey, String transactionHash, String multisigAddress, int timeToLiveInSeconds) {
         Signer signer = new DefaultSigner(privateKey);
         int currentTime = nodeClient.extendedInfo().nisInfo.currentTime;
@@ -243,21 +289,26 @@ public class SecureTransactionClient implements TransactionClient {
     public NemAnnounceResult importanceTransfer(String privateKey, Action action, String remoteAccountPublicKey, int timeToLiveInSeconds) {
         Signer signer = new DefaultSigner(privateKey);
         int currentTime = nodeClient.extendedInfo().nisInfo.currentTime;
+        String publicKey = signer.publicKey();
 
-        ImportanceTransferTransaction transaction = ImportanceTransferTransaction.builder()
+        ImportanceTransferTransaction transaction = importanceTransferTransaction(action, remoteAccountPublicKey, timeToLiveInSeconds, currentTime, publicKey);
+
+        byte[] data = transactionEncoder.data(transaction);
+
+        return feignTransactionClient.prepare(new RequestAnnounce(hexConverter.getString(data), signer.sign(data)));
+    }
+
+    private ImportanceTransferTransaction importanceTransferTransaction(Action action, String remoteAccountPublicKey, int timeToLiveInSeconds, int currentTime, String publicKey) {
+        return ImportanceTransferTransaction.builder()
                 .type(IMPORTANCE_TRANSFER_TRANSACTION.type)
                 .version(versionProvider.version(network, IMPORTANCE_TRANSFER_TRANSACTION))
                 .timeStamp(currentTime)
-                .signer(signer.publicKey())
+                .signer(publicKey)
                 .fee(feeCalculator.importanceTransferFee())
                 .deadline(currentTime + timeToLiveInSeconds)
                 .action(action)
                 .remoteAccount(remoteAccountPublicKey)
                 .build();
-
-        byte[] data = transactionEncoder.data(transaction);
-
-        return feignTransactionClient.prepare(new RequestAnnounce(hexConverter.getString(data), signer.sign(data)));
     }
 
     @Override
@@ -277,22 +328,27 @@ public class SecureTransactionClient implements TransactionClient {
     public NemAnnounceResult changeMosaicSupply(String privateKey, MosaicId mosaicId, SupplyType supplyType, long amount, int timeToLiveInSeconds) {
         Signer signer = new DefaultSigner(privateKey);
         int currentTime = nodeClient.extendedInfo().nisInfo.currentTime;
+        String publicKey = signer.publicKey();
 
-        MosaicSupplyChangeTransaction transaction = MosaicSupplyChangeTransaction.builder()
+        MosaicSupplyChangeTransaction transaction = mosaicSupplyChangeTransaction(mosaicId, supplyType, amount, publicKey, currentTime, timeToLiveInSeconds);
+
+        byte[] data = transactionEncoder.data(transaction);
+
+        return feignTransactionClient.prepare(new RequestAnnounce(hexConverter.getString(data), signer.sign(data)));
+    }
+
+    private MosaicSupplyChangeTransaction mosaicSupplyChangeTransaction(MosaicId mosaicId, SupplyType supplyType, long amount, String publicKey, int currentTime, int timeToLiveInSeconds) {
+        return MosaicSupplyChangeTransaction.builder()
                 .type(MOSAIC_SUPPLY_CHANGE.type)
                 .version(versionProvider.version(network, MOSAIC_SUPPLY_CHANGE))
                 .timeStamp(currentTime)
-                .signer(signer.publicKey())
+                .signer(publicKey)
                 .fee(feeCalculator.importanceTransferFee())
                 .deadline(currentTime + timeToLiveInSeconds)
                 .mosaicId(mosaicId)
                 .supplyType(supplyType)
                 .delta(amount)
                 .build();
-
-        byte[] data = transactionEncoder.data(transaction);
-
-        return feignTransactionClient.prepare(new RequestAnnounce(hexConverter.getString(data), signer.sign(data)));
     }
 
     private Transaction transferNemTransaction(String publicKey, String toAddress, long microXemAmount, String message, int currentTime, int timeToLiveInSeconds) {
