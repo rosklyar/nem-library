@@ -1,7 +1,7 @@
 # Lightweight java library to integrate with NEM blockchain
 
 Uses:
-- feign(https://github.com/OpenFeign/feign) to make http calls to NIS(based on docs from https://bob.nem.ninja/docs/)
+- feign(https://github.com/OpenFeign/feign) to make http calls to NIS(based on docs from https://nemproject.github.io/)
 - hystrix(https://github.com/Netflix/Hystrix) to implement circuit breaker
 - ribbon(https://github.com/Netflix/ribbon) to implement load balancing
 - archaius(https://github.com/Netflix/archaius) to configure library
